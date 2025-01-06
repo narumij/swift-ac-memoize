@@ -12,11 +12,17 @@ on:
 jobs:
   build:
 
-    runs-on: macos-latest
-
+    runs-on: ubuntu-24.04
+    
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Set up Swift
+      uses: SwiftyLab/setup-swift@latest
+    
     - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      run: swift build -v -c release
+    - name: Run tests (debug)
+      run: swift test -v -c debug
+    - name: Run tests (release)
+      run: swift test -v -c release
