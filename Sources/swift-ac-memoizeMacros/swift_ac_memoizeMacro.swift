@@ -64,7 +64,7 @@ public struct MemoizeBodyMacro: BodyMacro {
             
             func body\(functionSignature)\(codeBlock)
             
-            return body(\(raw: params))
+            return \(raw: funcBaseName)(\(raw: params))
             """
     ]
   }

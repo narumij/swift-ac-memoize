@@ -54,7 +54,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 return a + test(a - 1)
               }
           
-              return body(a)
+              return test(a)
           }
           """,
         macros: testMacros
@@ -112,7 +112,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 }
               }
           
-              return body(x, y: yy, z: z)
+              return tarai(x, y: yy, z: z)
           }
           """,
         macros: testMacros
