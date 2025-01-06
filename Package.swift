@@ -11,7 +11,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "swift-ac-memoize",
-            targets: ["swift-ac-memoize"]
+            targets: ["AcMemoize"]
         ),
         .executable(
             name: "swift-ac-memoizeClient",
@@ -34,10 +34,10 @@ let package = Package(
         ),
 
         // Library that exposes a macro as part of its API, which is used in client programs.
-        .target(name: "swift-ac-memoize", dependencies: ["swift-ac-memoizeMacros"]),
+        .target(name: "AcMemoize", dependencies: ["swift-ac-memoizeMacros"], path: "Sources/swift-ac-memoize/"),
 
         // A client of the library, which is able to use the macro in its own code.
-        .executableTarget(name: "swift-ac-memoizeClient", dependencies: ["swift-ac-memoize"]),
+        .executableTarget(name: "swift-ac-memoizeClient", dependencies: ["AcMemoize"]),
 
         // A test target used to develop the macro implementation.
         .testTarget(

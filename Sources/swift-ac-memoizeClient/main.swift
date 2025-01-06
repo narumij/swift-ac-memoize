@@ -1,4 +1,4 @@
-import swift_ac_memoize
+import AcMemoize
 
 let a = 17
 let b = 25
