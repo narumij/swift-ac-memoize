@@ -46,6 +46,46 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
+上のソースコードは、おおよそ以下のように展開されます。
+```swift
+static func tarai(x: Int, y: Int, z: Int) -> Int {
+  
+  typealias Args = (x: Int, y: Int, z: Int)
+  
+  enum Key: CustomKeyProtocol {
+    @inlinable @inline(__always)
+    static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
+  }
+  
+  var storage: MemoizeCacheBase<Key, Int> = .init()
+  
+  func tarai(x: Int, y: Int, z: Int) -> Int {
+    let args = (x,y,z)
+    if let result = storage[args] {
+      return result
+    }
+    let r = body(x: x, y: y, z: z)
+    storage[args] = r
+    return r
+  }
+  
+  func body(x: Int, y: Int, z: Int) -> Int {
+    if x <= y {
+      return y
+    } else {
+      return tarai(
+        x: tarai(x: x - 1, y: z, z: z),
+        y: tarai(x: y - 1, y: z, z: x),
+        z: tarai(x: z - 1, y: x, z: y))
+    }
+  }
+  
+  return tarai(x: x, y: y, z: z)
+}
+
+print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+```
+
 ## 注意事項
 
 - コンパイル環境に載らないと利用できないため、AC実績はまだありません。
