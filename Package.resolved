@@ -1,6 +1,14 @@
 {
-  "originHash" : "1b7f7847bed57c3a8b90b361b586b7f1ae36ec2068b382168c6d1454d30a97d9",
+  "originHash" : "623ac11d74cff6980b32990546a84898476a3a86660ba5c0146f04c5448c736f",
   "pins" : [
+    {
+      "identity" : "swift-ac-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/narumij/swift-ac-collections",
+      "state" : {
+        "revision" : "a05f4bbb73c41a317546207ed002ba33bb7cdd3b"
+      }
+    },
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
