@@ -51,7 +51,7 @@ let package = Package(
       name: "swift-ac-memoizeClient",
       dependencies: [
         "AcMemoize",
-        .product(name: "AcCollections", package: "swift-ac-collections"),
+//        .product(name: "AcCollections", package: "swift-ac-collections"),
       ]),
 
     // A test target used to develop the macro implementation.
@@ -66,7 +66,7 @@ let package = Package(
       name: "tests",
       dependencies: [
         "AcMemoize",
-        .product(name: "AcCollections", package: "swift-ac-collections"),
+//        .product(name: "AcCollections", package: "swift-ac-collections"),
       ]
     ),
   ]
