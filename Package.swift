@@ -41,7 +41,7 @@ let package = Package(
       name: "AcMemoize",
       dependencies: [
         "swift-ac-memoizeMacros",
-        .product(name: "RedBlackTreeModule", package: "swift-ac-collections"),
+        .product(name: "AcCollections", package: "swift-ac-collections"),
       ],
       path: "Sources/swift-ac-memoize/"
     ),
