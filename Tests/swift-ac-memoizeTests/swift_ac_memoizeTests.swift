@@ -34,7 +34,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 static func value_comp(_ a: Arg, _ b: Arg) -> Bool { a < b }
               }
 
-              var cache: ___RedBlackTreeMapBase< Key, Int > = .init()
+              var cache: MemoizeCacheBase< Key, Int > = .init()
 
               func test(_ a: Int) -> Int {
                 let args = (a)
@@ -86,7 +86,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 static func value_comp(_ a: Arg, _ b: Arg) -> Bool { a < b }
               }
 
-              var cache: ___RedBlackTreeMapBase< Key, Int > = .init()
+              var cache: MemoizeCacheBase< Key, Int > = .init()
 
               func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
                 let args = (x,yy,z)

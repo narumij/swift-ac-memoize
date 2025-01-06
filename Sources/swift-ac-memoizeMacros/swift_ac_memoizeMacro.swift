@@ -49,7 +49,7 @@ public struct MemoizeBodyMacro: BodyMacro {
               static func value_comp(_ a: Arg, _ b: Arg) -> Bool { a < b }
             }
             
-            var cache: ___RedBlackTreeMapBase< Key, \(funcDecl.signature.returnClause?.type ?? "Void")> = .init()
+            var cache: MemoizeCacheBase< Key, \(funcDecl.signature.returnClause?.type ?? "Void")> = .init()
 
             func \(raw: funcBaseName)\(functionSignature){
               let args = (\(raw: cacheKey))
