@@ -21,7 +21,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0-latest"),
     .package(
-      url: "https://github.com/narumij/swift-ac-collections",
+      url: "https://github.com/narumij/swift-ac-collections.git",
       from: "0.1.2"),
   ],
   targets: [
@@ -38,7 +38,12 @@ let package = Package(
 
     // Library that exposes a macro as part of its API, which is used in client programs.
     .target(
-      name: "AcMemoize", dependencies: ["swift-ac-memoizeMacros"], path: "Sources/swift-ac-memoize/"
+      name: "AcMemoize",
+      dependencies: [
+        "swift-ac-memoizeMacros",
+        .product(name: "RedBlackTreeModule", package: "swift-ac-collections"),
+      ],
+      path: "Sources/swift-ac-memoize/"
     ),
 
     // A client of the library, which is able to use the macro in its own code.
