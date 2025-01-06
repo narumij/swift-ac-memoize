@@ -1,6 +1,8 @@
 # swift-ac-memoize
 
-`swift-ac-collections` は、[AtCoder][atcoder]での利用を想定したメモ化マクロのオープソース・パッケージです。
+`swift-ac-memoize` is an open-source package of memoization macros for competitive programming on [AtCoder][atcoder].
+
+`swift-ac-memoize` は、[AtCoder][atcoder]での利用を想定したメモ化マクロのオープソース・パッケージです。
 
 ## 利用の仕方
 
