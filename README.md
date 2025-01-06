@@ -76,7 +76,7 @@ static func tarai(x: Int, y: Int, z: Int) -> Int {
       return y
     } else {
       return tarai(
-        x: tarai(x: x - 1, y: z, z: z),
+        x: tarai(x: x - 1, y: y, z: z),
         y: tarai(x: y - 1, y: z, z: x),
         z: tarai(x: z - 1, y: x, z: y))
     }
@@ -86,6 +86,16 @@ static func tarai(x: Int, y: Int, z: Int) -> Int {
 }
 
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+```
+
+フィボナッチ数は以下のようになります。
+```swift
+@Memoize
+func fibonacci(_ n: Int) -> Int {
+    if n <= 1 { return n }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+print(fibonacci(40)) // Output: 102_334_155
 ```
 
 ## 注意事項

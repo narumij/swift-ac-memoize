@@ -2,6 +2,15 @@ import AcMemoize
 
 #if true
 @Memoize
+func fibonacci(_ n: Int) -> Int {
+    if n <= 1 { return n }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+print(fibonacci(40)) // Output: 102_334_155
+#endif
+
+#if false
+@Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
   if x <= y {
     return y
