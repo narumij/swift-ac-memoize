@@ -1,5 +1,4 @@
 import AcMemoize
-import AcCollections
 
 #if true
 @Memoize
@@ -13,6 +12,5 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       z: tarai(x: z - 1, y: x, z: y))
   }
 }
-
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))")
 #endif
