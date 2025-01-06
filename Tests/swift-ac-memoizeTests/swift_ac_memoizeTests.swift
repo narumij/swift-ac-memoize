@@ -28,13 +28,14 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func test(_ a: Int) -> Int {
-              typealias Arg = (Int)
+              typealias Args = (Int)
 
               enum Key: CustomKeyProtocol {
-                static func value_comp(_ a: Arg, _ b: Arg) -> Bool { a < b }
+                @inlinable @inline(__always)
+                static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
               }
 
-              var cache: MemoizeCacheBase< Key, Int > = .init()
+              var cache: MemoizeCacheBase<Key,Int> = .init()
 
               func test(_ a: Int) -> Int {
                 let args = (a)
@@ -52,6 +53,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 }
                 return a + test(a - 1)
               }
+          
               return body(a)
           }
           """,
@@ -80,20 +82,21 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              typealias Arg = (Int, y : Int, z: Int)
+              typealias Args = (Int, y: Int, z: Int)
 
               enum Key: CustomKeyProtocol {
-                static func value_comp(_ a: Arg, _ b: Arg) -> Bool { a < b }
+                @inlinable @inline(__always)
+                static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
               }
 
-              var cache: MemoizeCacheBase< Key, Int > = .init()
+              var cache: MemoizeCacheBase<Key,Int> = .init()
 
               func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
                 let args = (x,yy,z)
                 if let result = cache[args] {
                   return result
                 }
-                let r = body(x,y :yy,z:z)
+                let r = body(x, y: yy, z: z)
                 cache[args] = r
                 return r
               }
@@ -108,7 +111,8 @@ final class swift_ac_memoizeTests: XCTestCase {
                     z: tarai(z - 1, y: x, z: yy))
                 }
               }
-              return body(x,y :yy,z:z)
+          
+              return body(x, y: yy, z: z)
           }
           """,
         macros: testMacros
