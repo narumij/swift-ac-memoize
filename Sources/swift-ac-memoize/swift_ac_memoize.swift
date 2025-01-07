@@ -1,4 +1,4 @@
-@_exported import AcCollections
+@_exported import RedBlackTreeModule
 
 public typealias MemoizeCacheBase = ___RedBlackTreeMapBase
 
