@@ -28,7 +28,7 @@ public struct MemoizeBodyMacro: BodyMacro {
       }
     }.joined(separator: ", ")
     let cacheKey = funcDecl.signature.parameterClause.parameters.map{
-      $0.secondName?.description ?? $0.firstName.description
+      $0.parameterName?.description ?? $0.firstName.description
     }.joined(separator: ",")
     let params = funcDecl.signature.parameterClause.parameters.map {
       switch ($0.firstName.tokenKind, $0.firstName, $0.parameterName) {
@@ -36,7 +36,7 @@ public struct MemoizeBodyMacro: BodyMacro {
         return "\(parameterName)"
       case (_,let firstName,.some(let parameterName)):
         return "\(firstName.trimmed): \(parameterName)"
-      default:
+      case (_,_,.none):
         fatalError()
       }
     }.joined(separator: ", ")
