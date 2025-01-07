@@ -1,5 +1,8 @@
 # swift-ac-memoize
 
+[![Swift](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml)  
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 `swift-ac-memoize` is an open-source package of memoization macros for competitive programming on [AtCoder][atcoder].
 
 `swift-ac-memoize` は、[AtCoder][atcoder]での利用を想定したメモ化マクロのオープソース・パッケージです。
