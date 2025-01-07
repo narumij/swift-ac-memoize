@@ -4,6 +4,10 @@
 import CompilerPluginSupport
 import PackageDescription
 
+let unchecked: [SwiftSetting] = [
+  .unsafeFlags(["-Ounchecked"], .when(configuration: .release))
+]
+
 let package = Package(
   name: "swift-ac-memoize",
   platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
@@ -37,7 +41,8 @@ let package = Package(
         "swift-ac-memoizeMacros",
         .product(name: "AcCollections", package: "swift-ac-collections"),
       ],
-      path: "Sources/swift-ac-memoize/"
+      path: "Sources/swift-ac-memoize/",
+      swiftSettings: unchecked
     ),
 
     // A client of the library, which is able to use the macro in its own code.
