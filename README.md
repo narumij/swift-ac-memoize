@@ -88,7 +88,7 @@ static func tarai(x: Int, y: Int, z: Int) -> Int {
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
-フィボナッチ数は以下のようになります。
+フィボナッチ数は以下のように書けます。
 ```swift
 @Memoize
 func fibonacci(_ n: Int) -> Int {
