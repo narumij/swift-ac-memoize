@@ -65,14 +65,14 @@ public struct MemoizeBodyMacro: BodyMacro {
               }
               var memo: Memoize.Tree = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
             }
-            
-            var cache = Cache()
             """
 
     return [
             """
             \(cache)
 
+            var cache = Cache()
+            
             func \(raw: funcBaseName)\(functionSignature){
               let args = (\(raw: cacheKey))
               if let result = cache.memo[args] {
