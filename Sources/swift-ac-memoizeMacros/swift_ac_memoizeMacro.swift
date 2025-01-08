@@ -54,43 +54,24 @@ public struct MemoizeBodyMacro: BodyMacro {
       }
     }.joined(separator: ", ")
     
-    let localCache: CodeBlockItemSyntax =
+    let cache: CodeBlockItemSyntax =
             """
-            struct LocalCache {
-              enum Memoize: MemoizationCacheProtocol {
+            struct Cache {
+              enum Memoize: _MemoizationProtocol {
                 typealias Parameter = (\(raw: args))
                 typealias Return = \(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")
                 @inlinable @inline(__always)
                 static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool { a < b }
               }
-              var memo: Memoize.Cache = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
+              var memo: Memoize.Tree = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
             }
             
-            var cache = LocalCache()
-            """
-    
-    let globalCache: CodeBlockItemSyntax =
-            """
-            struct GlobalCache {
-              enum Memoize: MemoizationCacheProtocol {
-                typealias Parameter = (\(raw: args))
-                typealias Return = \(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")
-                @inlinable @inline(__always)
-                static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool { a < b }
-              }
-              nonisolated(unsafe) static var cache: Memoize.Cache = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
-              var memo: Memoize.Cache {
-                get { Self.cache }
-                _modify { yield &Self.cache }
-              }
-            }
-            
-            var cache = GlobalCache()
+            var cache = Cache()
             """
 
     return [
             """
-            \(localCache)
+            \(cache)
 
             func \(raw: funcBaseName)\(functionSignature){
               let args = (\(raw: cacheKey))

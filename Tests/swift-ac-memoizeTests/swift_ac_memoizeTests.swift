@@ -28,8 +28,8 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func test(_ a: Int) -> Int {
-              struct LocalCache {
-                enum Memoize: MemoizationCacheProtocol {
+              struct Cache {
+                enum Memoize: _MemoizationProtocol {
                   typealias Parameter = (Int)
                   typealias Return = Int
                   @inlinable @inline(__always)
@@ -37,10 +37,10 @@ final class swift_ac_memoizeTests: XCTestCase {
                       a < b
                   }
                 }
-                var memo: Memoize.Cache = .init(maximumCapacity: Int.max)
+                var memo: Memoize.Tree = .init(maximumCapacity: Int.max)
               }
 
-              var cache = LocalCache()
+              var cache = Cache()
 
               func test(_ a: Int) -> Int {
                 let args = (a)
@@ -87,8 +87,8 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              struct LocalCache {
-                enum Memoize: MemoizationCacheProtocol {
+              struct Cache {
+                enum Memoize: _MemoizationProtocol {
                   typealias Parameter = (Int, y: Int, z: Int)
                   typealias Return = Int
                   @inlinable @inline(__always)
@@ -96,10 +96,10 @@ final class swift_ac_memoizeTests: XCTestCase {
                       a < b
                   }
                 }
-                var memo: Memoize.Cache = .init(maximumCapacity: Int.max)
+                var memo: Memoize.Tree = .init(maximumCapacity: Int.max)
               }
 
-              var cache = LocalCache()
+              var cache = Cache()
 
               func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
                 let args = (x,yy,z)
