@@ -56,22 +56,25 @@ public struct MemoizeBodyMacro: BodyMacro {
 
     return [
             """
-            typealias Args = (\(raw: args))
-            
-            enum Key: CustomKeyProtocol {
-              @inlinable @inline(__always)
-              static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
+            struct LocalCache {
+              enum Memoize: MemoizationCacheProtocol {
+                typealias Parameter = (\(raw: args))
+                typealias Return = \(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")
+                @inlinable @inline(__always)
+                static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool { a < b }
+              }
+              var memo: Memoize.Cache = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
             }
             
-            var cache: MemoizeCacheBase<Key,\(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")> = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
+            var cache = LocalCache()
 
             func \(raw: funcBaseName)\(functionSignature){
               let args = (\(raw: cacheKey))
-              if let result = cache[args] {
+              if let result = cache.memo[args] {
                 return result
               }
               let r = body(\(raw: params))
-              cache[args] = r
+              cache.memo[args] = r
               return r
             }
             

@@ -28,22 +28,27 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func test(_ a: Int) -> Int {
-              typealias Args = (Int)
-
-              enum Key: CustomKeyProtocol {
-                @inlinable @inline(__always)
-                static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
+              struct LocalCache {
+                enum Memoize: MemoizationCacheProtocol {
+                  typealias Parameter = (Int)
+                  typealias Return = Int
+                  @inlinable @inline(__always)
+                  static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool {
+                      a < b
+                  }
+                }
+                var memo: Memoize.Cache = .init(maximumCapacity: Int.max)
               }
 
-              var cache: MemoizeCacheBase<Key,Int> = .init(maximumCapacity: Int.max)
+              var cache = LocalCache()
 
               func test(_ a: Int) -> Int {
                 let args = (a)
-                if let result = cache[args] {
+                if let result = cache.memo[args] {
                   return result
                 }
                 let r = body(a)
-                cache[args] = r
+                cache.memo[args] = r
                 return r
               }
 
@@ -82,22 +87,27 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              typealias Args = (Int, y: Int, z: Int)
-
-              enum Key: CustomKeyProtocol {
-                @inlinable @inline(__always)
-                static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
+              struct LocalCache {
+                enum Memoize: MemoizationCacheProtocol {
+                  typealias Parameter = (Int, y: Int, z: Int)
+                  typealias Return = Int
+                  @inlinable @inline(__always)
+                  static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool {
+                      a < b
+                  }
+                }
+                var memo: Memoize.Cache = .init(maximumCapacity: Int.max)
               }
 
-              var cache: MemoizeCacheBase<Key,Int> = .init(maximumCapacity: Int.max)
+              var cache = LocalCache()
 
               func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
                 let args = (x,yy,z)
-                if let result = cache[args] {
+                if let result = cache.memo[args] {
                   return result
                 }
                 let r = body(x, y: yy, z: z)
-                cache[args] = r
+                cache.memo[args] = r
                 return r
               }
 
