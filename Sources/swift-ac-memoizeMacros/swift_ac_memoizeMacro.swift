@@ -16,6 +16,19 @@ public struct MemoizeBodyMacro: BodyMacro {
       return []
     }
     
+    var limit: String?
+
+    let arguments = node.arguments?.as(LabeledExprListSyntax.self) ?? []
+
+    for argument in arguments {
+        if let label = argument.label?.text, label == "limit" {
+            if let valueExpr = argument.expression.as(IntegerLiteralExprSyntax.self) {
+              limit = valueExpr.literal.text
+                break
+            }
+        }
+    }
+    
     let funcBaseName = funcDecl.name.text
     let functionSignature = funcDecl.signature
     let codeBlock = funcDecl.body
@@ -50,7 +63,7 @@ public struct MemoizeBodyMacro: BodyMacro {
               static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
             }
             
-            var cache: MemoizeCacheBase<Key,\(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")> = .init()
+            var cache: MemoizeCacheBase<Key,\(raw: funcDecl.signature.returnClause?.type.trimmedDescription ?? "Void")> = .init(maximumCapacity: \(raw: limit ?? "Int.max"))
 
             func \(raw: funcBaseName)\(functionSignature){
               let args = (\(raw: cacheKey))

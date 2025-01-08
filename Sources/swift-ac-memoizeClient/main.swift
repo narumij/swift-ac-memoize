@@ -1,7 +1,7 @@
 import AcMemoize
 
 #if true
-@Memoize
+@Memoize(limit: 15)
 func fibonacci(_ n: Int) -> Int {
     if n <= 1 { return n }
     return fibonacci(n - 1) + fibonacci(n - 2)
