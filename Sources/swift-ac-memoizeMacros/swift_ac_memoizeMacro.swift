@@ -21,7 +21,7 @@ public struct MemoizeBodyMacro: BodyMacro {
     let arguments = node.arguments?.as(LabeledExprListSyntax.self) ?? []
 
     for argument in arguments {
-        if let label = argument.label?.text, label == "limit" {
+        if let label = argument.label?.text, label == "maxCount" {
             if let valueExpr = argument.expression.as(IntegerLiteralExprSyntax.self) {
               limit = valueExpr.literal.text
                 break
