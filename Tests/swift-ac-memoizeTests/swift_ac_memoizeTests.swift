@@ -18,7 +18,7 @@ final class swift_ac_memoizeTests: XCTestCase {
     #if canImport(swift_ac_memoizeMacros)
       assertMacroExpansion(
         """
-        @Memoize
+        @Memoize(maxCount: 0)
         func test(_ a: Int) -> Int {
           if a == 10 {
             return 10
@@ -28,37 +28,35 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func test(_ a: Int) -> Int {
-              struct Cache {
-                enum Memoize: _MemoizationProtocol {
-                  typealias Parameter = (Int)
-                  typealias Return = Int
-                  @inlinable @inline(__always)
-                  static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool {
-                      a < b
-                  }
+              enum ___Cache: _MemoizationProtocol {
+                @usableFromInline typealias Parameters = (Int)
+                @usableFromInline typealias Return = Int
+                @usableFromInline typealias Instance = Tree
+                @inlinable @inline(__always)
+                static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
+                  a < b
                 }
-                var memo: Memoize.Tree = .init(maximumCapacity: Int.max)
+                @inlinable @inline(__always)
+                static func create() -> Instance {
+                  .init(maximumCapacity: 0)
+                }
               }
-
-              var cache = Cache()
-
+              var ___cache = ___Cache.create()
               func test(_ a: Int) -> Int {
                 let args = (a)
-                if let result = cache.memo[args] {
+                if let result = ___cache[args] {
                   return result
                 }
                 let r = body(a)
-                cache.memo[args] = r
+                ___cache[args] = r
                 return r
               }
-
               func body(_ a: Int) -> Int {
                 if a == 10 {
                   return 10
                 }
                 return a + test(a - 1)
               }
-          
               return test(a)
           }
           """,
@@ -70,6 +68,67 @@ final class swift_ac_memoizeTests: XCTestCase {
   }
 
   func testMacro2() throws {
+    #if canImport(swift_ac_memoizeMacros)
+      assertMacroExpansion(
+        """
+        @Memoize(maxCount: 0)
+        func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+          if x <= yy {
+            return yy
+          } else {
+            return tarai(
+              tarai(x - 1, y: yy, z: z),
+              y: tarai(yy - 1, y: z, z: x),
+              z: tarai(z - 1, y: x, z: yy))
+          }
+        }
+        """,
+        expandedSource: """
+          func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+              enum ___Cache: _MemoizationProtocol {
+                @usableFromInline typealias Parameters = (Int, y: Int, z: Int)
+                @usableFromInline typealias Return = Int
+                @usableFromInline typealias Instance = Tree
+                @inlinable @inline(__always)
+                static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
+                  a < b
+                }
+                @inlinable @inline(__always)
+                static func create() -> Instance {
+                  .init(maximumCapacity: 0)
+                }
+              }
+              var ___cache = ___Cache.create()
+              func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+                let args = (x, y: yy, z: z)
+                if let result = ___cache[args] {
+                  return result
+                }
+                let r = body(x, y: yy, z: z)
+                ___cache[args] = r
+                return r
+              }
+              func body(_ x: Int, y yy: Int, z: Int) -> Int {
+                if x <= yy {
+                  return yy
+                } else {
+                  return tarai(
+                    tarai(x - 1, y: yy, z: z),
+                    y: tarai(yy - 1, y: z, z: x),
+                    z: tarai(z - 1, y: x, z: yy))
+                }
+              }
+              return tarai(x, y: yy, z: z)
+          }
+          """,
+        macros: testMacros
+      )
+    #else
+      throw XCTSkip("macros are only supported when running tests for the host platform")
+    #endif
+  }
+  
+  func testMacro3() throws {
     #if canImport(swift_ac_memoizeMacros)
       assertMacroExpansion(
         """
@@ -87,30 +146,34 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              struct Cache {
-                enum Memoize: _MemoizationProtocol {
-                  typealias Parameter = (Int, y: Int, z: Int)
-                  typealias Return = Int
-                  @inlinable @inline(__always)
-                  static func value_comp(_ a: Parameter, _ b: Parameter) -> Bool {
-                      a < b
+              enum ___Cache {
+                @usableFromInline struct Parameters: Hashable {
+                  init(_ x: Int, y yy: Int, z: Int) {
+                    self.x = x
+                self.y = yy
+                self.z = z
                   }
+                  @usableFromInline let x: Int
+                @usableFromInline let y: Int
+                @usableFromInline let z: Int
                 }
-                var memo: Memoize.Tree = .init(maximumCapacity: Int.max)
+                @usableFromInline typealias Return = Int
+                @usableFromInline typealias Instance = [Parameters: Return]
+                @inlinable @inline(__always)
+                static func create() -> Instance {
+                  [:]
+                }
               }
-
-              var cache = Cache()
-
+              var ___cache = ___Cache.create()
               func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-                let args = (x,yy,z)
-                if let result = cache.memo[args] {
+                let args = ___Cache.Parameters(x, y: yy, z: z)
+                if let result = ___cache[args] {
                   return result
                 }
                 let r = body(x, y: yy, z: z)
-                cache.memo[args] = r
+                ___cache[args] = r
                 return r
               }
-
               func body(_ x: Int, y yy: Int, z: Int) -> Int {
                 if x <= yy {
                   return yy
@@ -121,7 +184,6 @@ final class swift_ac_memoizeTests: XCTestCase {
                     z: tarai(z - 1, y: x, z: yy))
                 }
               }
-          
               return tarai(x, y: yy, z: z)
           }
           """,
