@@ -47,11 +47,11 @@ final class swift_ac_memoizeTests: XCTestCase {
                 if let result = ___cache[args] {
                   return result
                 }
-                let r = body(a)
+                let r = ___body(a)
                 ___cache[args] = r
                 return r
               }
-              func body(_ a: Int) -> Int {
+              func ___body(_ a: Int) -> Int {
                 if a == 10 {
                   return 10
                 }
@@ -104,11 +104,11 @@ final class swift_ac_memoizeTests: XCTestCase {
                 if let result = ___cache[args] {
                   return result
                 }
-                let r = body(x, y: yy, z: z)
+                let r = ___body(x, y: yy, z: z)
                 ___cache[args] = r
                 return r
               }
-              func body(_ x: Int, y yy: Int, z: Int) -> Int {
+              func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
                 if x <= yy {
                   return yy
                 } else {
@@ -170,11 +170,11 @@ final class swift_ac_memoizeTests: XCTestCase {
                 if let result = ___cache[args] {
                   return result
                 }
-                let r = body(x, y: yy, z: z)
+                let r = ___body(x, y: yy, z: z)
                 ___cache[args] = r
                 return r
               }
-              func body(_ x: Int, y yy: Int, z: Int) -> Int {
+              func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
                 if x <= yy {
                   return yy
                 } else {

@@ -127,11 +127,11 @@ func functionBody(_ funcDecl: FunctionDeclSyntax, initialize: String) -> CodeBlo
       if let result = \(cache)[args] {
         return result
       }
-      let r = body(\(raw: params))
+      let r = ___body(\(raw: params))
       \(cache)[args] = r
       return r
     }
-    func body\(funcDecl.signature)\(funcDecl.body)
+    func ___body\(funcDecl.signature)\(funcDecl.body)
     return \(raw: funcDecl.name)(\(raw: params))
     """
 }
