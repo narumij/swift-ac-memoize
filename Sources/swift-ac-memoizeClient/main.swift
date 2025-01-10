@@ -1,6 +1,6 @@
 import AcMemoize
 
-#if true
+#if false
 @Memoize(maxCount: 15)
 func fibonacci(_ n: Int) -> Int {
     if n <= 1 { return n }
@@ -9,8 +9,8 @@ func fibonacci(_ n: Int) -> Int {
 print(fibonacci(40)) // Output: 102_334_155
 #endif
 
-#if false
-@Memoize
+#if true
+@Memoize(maxCount: 100)
 func tarai(x: Int, y: Int, z: Int) -> Int {
   if x <= y {
     return y
@@ -22,8 +22,9 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
   }
 }
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))")
+#endif
 
-
+#if false
 struct A {
 
   @Memoize
