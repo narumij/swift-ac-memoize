@@ -31,7 +31,7 @@ final class swift_ac_memoizeTests: XCTestCase {
               enum ___Cache: _MemoizationProtocol {
                 @usableFromInline typealias Parameters = (Int)
                 @usableFromInline typealias Return = Int
-                @usableFromInline typealias Instance = Tree
+                @usableFromInline typealias Instance = LRU
                 @inlinable @inline(__always)
                 static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
                   a < b
@@ -88,7 +88,7 @@ final class swift_ac_memoizeTests: XCTestCase {
               enum ___Cache: _MemoizationProtocol {
                 @usableFromInline typealias Parameters = (Int, y: Int, z: Int)
                 @usableFromInline typealias Return = Int
-                @usableFromInline typealias Instance = Tree
+                @usableFromInline typealias Instance = LRU
                 @inlinable @inline(__always)
                 static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
                   a < b

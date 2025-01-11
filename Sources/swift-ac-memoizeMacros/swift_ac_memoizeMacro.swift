@@ -103,7 +103,7 @@ func treeCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeB
     enum ___Cache: _MemoizationProtocol {
       @usableFromInline typealias Parameters = (\(raw: params))
       @usableFromInline typealias Return = \(returnType(funcDecl))
-      @usableFromInline typealias Instance = Tree
+      @usableFromInline typealias Instance = LRU
       @inlinable @inline(__always)
       static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
         a < b
