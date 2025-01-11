@@ -110,7 +110,7 @@ func treeCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeB
       }
       @inlinable @inline(__always)
       static func create() -> Instance {
-        .init(maximumCapacity: \(raw: limit ?? "Int.max"))
+        .init(maxCount: \(raw: limit ?? "Int.max"))
       }
     }
     """

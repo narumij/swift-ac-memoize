@@ -38,7 +38,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 }
                 @inlinable @inline(__always)
                 static func create() -> Instance {
-                  .init(maximumCapacity: 0)
+                  .init(maxCount: 0)
                 }
               }
               var ___cache = ___Cache.create()
@@ -95,7 +95,7 @@ final class swift_ac_memoizeTests: XCTestCase {
                 }
                 @inlinable @inline(__always)
                 static func create() -> Instance {
-                  .init(maximumCapacity: 0)
+                  .init(maxCount: 0)
                 }
               }
               var ___cache = ___Cache.create()
