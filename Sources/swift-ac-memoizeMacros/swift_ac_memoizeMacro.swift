@@ -28,7 +28,7 @@ public struct MemoizeBodyMacro: BodyMacro {
     if let maxCount {
       return [
         """
-        \(treeCache(funcDecl, maxCount: maxCount))
+        \(lruCache(funcDecl, maxCount: maxCount))
         var \(cacheName(funcDecl)) = ___Cache.create()
         \(functionBody(funcDecl, initialize: ""))
         """
@@ -93,7 +93,7 @@ func hashCache(_ funcDecl: FunctionDeclSyntax) -> CodeBlockItemSyntax {
     """
 }
 
-func treeCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeBlockItemSyntax {
+func lruCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeBlockItemSyntax {
   let params = typeParameter(funcDecl)
   return """
     enum ___Cache: _MemoizationProtocol {
@@ -148,16 +148,16 @@ func callParameters(_ funcDecl: FunctionDeclSyntax) -> String {
 func typeParameter(_ funcDecl: FunctionDeclSyntax) -> String {
   funcDecl.signature.parameterClause.parameters.map {
     switch ($0.firstName.tokenKind, $0.firstName, $0.type) {
-    case (.wildcard,_,let type):
+    case (.wildcard, _, let type):
       return "\(type)"
-    case (_,let firstName,let type):
+    case (_, let firstName, let type):
       return "\(firstName.trimmed): \(type)"
     }
   }.joined(separator: ", ")
 }
 
 func cacheName(_ funcDecl: FunctionDeclSyntax) -> TokenSyntax {
-//  "\(raw: funcDecl.name.text)_cache"
+  //  "\(raw: funcDecl.name.text)_cache"
   "___cache"
 }
 
@@ -185,4 +185,3 @@ func maxCount(_ node: AttributeSyntax) -> String? {
 func isLRU(_ node: AttributeSyntax) -> Bool {
   node.description.lowercased().contains("lru")
 }
-

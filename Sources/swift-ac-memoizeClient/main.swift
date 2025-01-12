@@ -10,7 +10,7 @@ print(fibonacci(40)) // Output: 102_334_155
 #endif
 
 #if true
-@Memoize(maxCount: nil)
+@Memoize(maxCount: Int.max)
 //@Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
   if x <= y {
@@ -22,7 +22,7 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       z: tarai(x: z - 1, y: x, z: y))
   }
 }
-print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))")
+print("Tak 40 20 0 is \(tarai(x: 40, y: 20, z: 0))")
 #endif
 
 func A() {
