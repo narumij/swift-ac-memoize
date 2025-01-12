@@ -79,11 +79,11 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       if let result = ___cache[args] {
         return result
       }
-      let r = body(x: x, y: y, z: z)
+      let r = ___body(x: x, y: y, z: z)
       ___cache[args] = r
       return r
     }
-    func body(x: Int, y: Int, z: Int) -> Int {
+    func ___body(x: Int, y: Int, z: Int) -> Int {
       if x <= y {
         return y
       } else {
@@ -129,7 +129,7 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       }
       @inlinable @inline(__always)
       static func create() -> Instance {
-        .init(maximumCapacity: 100)
+        .init(maxCount: 100)
       }
     }
     var ___cache = ___Cache.create()
@@ -138,11 +138,11 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       if let result = ___cache[args] {
         return result
       }
-      let r = body(x: x, y: y, z: z)
+      let r = ___body(x: x, y: y, z: z)
       ___cache[args] = r
       return r
     }
-    func body(x: Int, y: Int, z: Int) -> Int {
+    func ___body(x: Int, y: Int, z: Int) -> Int {
       if x <= y {
         return y
       } else {
