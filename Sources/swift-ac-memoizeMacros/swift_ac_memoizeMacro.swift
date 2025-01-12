@@ -4,6 +4,13 @@ import SwiftSyntaxBuilder
 @_spi(Testing) import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
 
+@main
+struct swift_ac_memoizePlugin: CompilerPlugin {
+  let providingMacros: [Macro.Type] = [
+    MemoizeBodyMacro.self
+  ]
+}
+
 public struct MemoizeBodyMacro: BodyMacro {
 
   public static func expansion(
@@ -99,7 +106,7 @@ func treeCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeB
       }
       @inlinable @inline(__always)
       static func create() -> Instance {
-        .init(maxCount: \(raw: limit ?? "Int.max"))
+        Instance(maxCount: \(raw: limit ?? "Int.max"))
       }
     }
     """
@@ -179,9 +186,3 @@ func isLRU(_ node: AttributeSyntax) -> Bool {
   node.description.lowercased().contains("lru")
 }
 
-@main
-struct swift_ac_memoizePlugin: CompilerPlugin {
-  let providingMacros: [Macro.Type] = [
-    MemoizeBodyMacro.self
-  ]
-}
