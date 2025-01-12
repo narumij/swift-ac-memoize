@@ -16,18 +16,7 @@ public struct MemoizeBodyMacro: BodyMacro {
       return []
     }
 
-    var maxCount: String?
-
-    let arguments = node.arguments?.as(LabeledExprListSyntax.self) ?? []
-
-    for argument in arguments {
-      if let label = argument.label?.text, label == "maxCount" {
-        if let valueExpr = argument.expression.as(IntegerLiteralExprSyntax.self) {
-          maxCount = valueExpr.literal.text
-          break
-        }
-      }
-    }
+    let maxCount: String? = maxCount(node)
 
     if let maxCount {
       return [
@@ -167,6 +156,27 @@ func cacheName(_ funcDecl: FunctionDeclSyntax) -> TokenSyntax {
 
 func returnType(_ funcDecl: FunctionDeclSyntax) -> TypeSyntax {
   funcDecl.signature.returnClause?.type.trimmed ?? "Void"
+}
+
+func maxCount(_ node: AttributeSyntax) -> String? {
+  var maxCount: String?
+  let arguments = node.arguments?.as(LabeledExprListSyntax.self) ?? []
+  for argument in arguments {
+    if let label = argument.label?.text, label == "maxCount" {
+      if let valueExpr = argument.expression.as(IntegerLiteralExprSyntax.self) {
+        maxCount = valueExpr.literal.text
+        break
+      }
+      if argument.expression.is(NilLiteralExprSyntax.self) {
+        maxCount = "nil"
+      }
+    }
+  }
+  return maxCount ?? (isLRU(node) ? "nil" : nil)
+}
+
+func isLRU(_ node: AttributeSyntax) -> Bool {
+  node.description.lowercased().contains("lru")
 }
 
 @main
