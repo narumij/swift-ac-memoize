@@ -77,7 +77,7 @@ print((1..<16).map { fib($0) })
 ```
 
 引数を与えた場合、保持するキャッシュ数を制限します。
-内部キャッシュに平衡二分探索木を用いた[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)キャッシュを使用します。
+内部キャッシュに平衡二分探索木を用いた[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU))キャッシュを使用します。
 
 
 ```swift
