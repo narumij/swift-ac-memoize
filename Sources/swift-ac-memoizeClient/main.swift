@@ -1,15 +1,16 @@
 import AcMemoize
 
-#if false
-@Memoize(maxCount: 15)
+#if true
+@Memoize(maxCount: Int.max)
 func fibonacci(_ n: Int) -> Int {
     if n <= 1 { return n }
     return fibonacci(n - 1) + fibonacci(n - 2)
 }
+print((1..<16).map { fibonacci($0) }) // Output: [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
 print(fibonacci(40)) // Output: 102_334_155
 #endif
 
-#if true
+#if false
 //@Memoize(maxCount: Int.max)
 @Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
