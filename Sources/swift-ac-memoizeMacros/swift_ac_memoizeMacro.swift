@@ -29,75 +29,89 @@ public struct MemoizeBodyMacro: BodyMacro {
       return [
         """
         \(lruCache(funcDecl, maxCount: maxCount))
-        var \(cacheName(funcDecl)) = ___Cache.create()
-        \(functionBody(funcDecl, initialize: ""))
+        """,
         """
-      ]
+        var \(cacheName(funcDecl)) = \(cacheTypeName(funcDecl)).create()
+        """
+      ] +
+      functionBody(funcDecl, initialize: "")
     } else {
       return [
         """
         \(hashCache(funcDecl))
-        var \(cacheName(funcDecl)) = ___Cache.create()
-        \(functionBody(funcDecl, initialize: "___Cache.Parameters"))
+        """,
         """
-      ]
+        var \(cacheName(funcDecl)) = \(cacheTypeName(funcDecl)).create()
+        """
+      ] +
+      functionBody(funcDecl, initialize: "\(cacheTypeName(funcDecl)).Parameters")
     }
   }
 }
 
 func structParameters(_ name: TypeSyntax, _ parameterClause: FunctionParameterClauseSyntax)
-  -> CodeBlockItemSyntax
+-> Syntax
 {
 
-  let inits = parameterClause.parameters.map {
+  let ii: (FunctionParameterSyntax) -> (TokenSyntax, TokenSyntax) = {
     switch ($0.firstName.tokenKind, $0.firstName, $0.parameterName) {
     case (.wildcard, _, .some(let parameterName)):
-      return "self.\(parameterName) = \(parameterName)"
+      return (parameterName, parameterName)
     case (_, let firstName, .some(let parameterName)):
-      return "self.\(firstName.trimmed) = \(parameterName)"
+      return (firstName.trimmed, parameterName)
     case (_, _, .none):
       fatalError()
     }
-  }.joined(separator: "\n")
+  }
 
-  let members = parameterClause.parameters.map {
+  let mm: (FunctionParameterSyntax) -> (TokenSyntax, TypeSyntax) = {
     switch ($0.firstName.tokenKind, $0.firstName, $0.parameterName, $0.type) {
     case (.wildcard, _, .some(let parameterName), let type):
-      return "@usableFromInline let \(parameterName): \(type)"
+      return (parameterName, type)
     case (_, let firstName, _, let type):
-      return "@usableFromInline let \(firstName.trimmed): \(type)"
+      return (firstName.trimmed, type)
     }
-  }.joined(separator: "\n")
-
-  return """
-    @usableFromInline struct \(name): Hashable {
-      init\(parameterClause){
-        \(raw: inits)
+  }
+  
+  let inheritedClause = InheritanceClauseSyntax {
+    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("Hashable")))
+  }
+  
+  return StructDeclSyntax(name: "\(name)", inheritanceClause: inheritedClause) {
+    for (propertyName, propertyType) in parameterClause.parameters.map(mm) {
+      DeclSyntax("@usableFromInline let \(propertyName): \(propertyType)")
+    }
+    InitializerDeclSyntax(signature: .init(parameterClause: parameterClause)) {
+      for (propertyName, parameterName) in parameterClause.parameters.map(ii) {
+        ExprSyntax("self.\(propertyName) = \(parameterName)\n")
       }
-      \(raw: members)
     }
-    """
+  }
+  .formatted()
 }
 
-func hashCache(_ funcDecl: FunctionDeclSyntax) -> CodeBlockItemSyntax {
+func hashCache(_ funcDecl: FunctionDeclSyntax) -> DeclSyntax {
   return """
-    enum ___Cache {
-      \(structParameters("Parameters", funcDecl.signature.parameterClause))
+    enum \(cacheTypeName(funcDecl)): _HashableMemoizationCacheProtocol {
+      @usableFromInline \(structParameters("Parameters", funcDecl.signature.parameterClause))
       @usableFromInline typealias Return = \(returnType(funcDecl))
-      @usableFromInline typealias Instance = [Parameters:Return]
+      @usableFromInline typealias Instance = Standard
+      @inlinable @inline(__always)
+      static func params\(funcDecl.signature.parameterClause)-> Parameters {
+        Parameters(\(paramsExpr(funcDecl)))
+      }
       @inlinable @inline(__always)
       static func create() -> Instance {
-        [:]
+        .init()
       }
     }
     """
 }
 
-func lruCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeBlockItemSyntax {
-  let params = typeParameter(funcDecl)
+func lruCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> DeclSyntax {
   return """
-    enum ___Cache: _MemoizationProtocol {
-      @usableFromInline typealias Parameters = (\(raw: params))
+    enum \(cacheTypeName(funcDecl)): _ComparableMemoizationCacheProtocol {
+      @usableFromInline typealias Parameters = (\(raw: tupleTypeElement(funcDecl)))
       @usableFromInline typealias Return = \(returnType(funcDecl))
       @usableFromInline typealias Instance = LRU
       @inlinable @inline(__always)
@@ -105,59 +119,80 @@ func lruCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> CodeBl
         a < b
       }
       @inlinable @inline(__always)
+      static func params\(funcDecl.signature.parameterClause) -> Parameters {
+        (\(paramsExpr(funcDecl)))
+      }
+      @inlinable @inline(__always)
       static func create() -> Instance {
-        Instance(maxCount: \(raw: limit ?? "Int.max"))
+        .init(maxCount: \(raw: limit ?? "Int.max"))
       }
     }
     """
 }
 
-func functionBody(_ funcDecl: FunctionDeclSyntax, initialize: String) -> CodeBlockItemSyntax {
+func functionBody(_ funcDecl: FunctionDeclSyntax, initialize: String) -> [CodeBlockItemSyntax] {
 
   let cache: TokenSyntax = cacheName(funcDecl)
-  let params = callParameters(funcDecl)
-
-  return """
+  let arguments: LabeledExprListSyntax = paramsExpr(funcDecl)
+  
+  return [
+    """
     func \(funcDecl.name)\(funcDecl.signature){
-      let args = \(raw: initialize)(\(raw: params))
-      if let result = \(cache)[args] {
+      typealias ___C = \(cacheTypeName(funcDecl))
+      let params = ___C.params(\(arguments))
+      if let result = \(cache)[params] {
         return result
       }
-      let r = ___body(\(raw: params))
-      \(cache)[args] = r
+      let r = ___body(\(arguments))
+      \(cache)[params] = r
       return r
     }
-    func ___body\(funcDecl.signature)\(funcDecl.body)
-    return \(raw: funcDecl.name)(\(raw: params))
+    """,
     """
+    func ___body\(funcDecl.signature)\(funcDecl.body)
+    """,
+    """
+    return \(funcDecl.name)(\(arguments))
+    """
+  ]
 }
 
-func callParameters(_ funcDecl: FunctionDeclSyntax) -> String {
-  funcDecl.signature.parameterClause.parameters.map {
-    switch ($0.firstName.tokenKind, $0.firstName, $0.parameterName) {
+func paramsExpr(_ funcDecl: FunctionDeclSyntax) -> LabeledExprListSyntax {
+  
+  func expr(_ p: FunctionParameterSyntax) -> LabeledExprSyntax? {
+    switch (p.firstName.tokenKind, p.firstName, p.parameterName) {
     case (.wildcard, _, .some(let parameterName)):
-      return "\(parameterName)"
+      return LabeledExprSyntax(expression: ExprSyntax(stringLiteral: "\(parameterName)"))
     case (_, let firstName, .some(let parameterName)):
-      return "\(firstName.trimmed): \(parameterName)"
+      return LabeledExprSyntax(label: firstName.trimmed, colon: ":", expression: ExprSyntax(stringLiteral: "\(parameterName)"))
     case (_, _, .none):
-      fatalError()
+      return nil
     }
-  }.joined(separator: ", ")
+  }
+  
+  return LabeledExprListSyntax {
+    for labeldExprSyntax in funcDecl.signature.parameterClause.parameters.compactMap(expr) {
+      labeldExprSyntax
+    }
+  }
 }
 
-func typeParameter(_ funcDecl: FunctionDeclSyntax) -> String {
+func tupleTypeElement(_ funcDecl: FunctionDeclSyntax) -> String {
   funcDecl.signature.parameterClause.parameters.map {
     switch ($0.firstName.tokenKind, $0.firstName, $0.type) {
-    case (.wildcard, _, let type):
+    case (.wildcard,_,let type):
       return "\(type)"
-    case (_, let firstName, let type):
+    case (_,let firstName,let type):
       return "\(firstName.trimmed): \(type)"
     }
   }.joined(separator: ", ")
 }
 
+func cacheTypeName(_ funcDecl: FunctionDeclSyntax) -> TokenSyntax {
+  "___Cache"
+}
+
 func cacheName(_ funcDecl: FunctionDeclSyntax) -> TokenSyntax {
-  //  "\(raw: funcDecl.name.text)_cache"
   "___cache"
 }
 

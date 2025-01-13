@@ -28,7 +28,7 @@ final class swift_ac_memoizeTests: XCTestCase {
         """,
         expandedSource: """
           func test(_ a: Int) -> Int {
-              enum ___Cache: _MemoizationProtocol {
+              enum ___Cache: _ComparableMemoizationCacheProtocol {
                 @usableFromInline typealias Parameters = (Int)
                 @usableFromInline typealias Return = Int
                 @usableFromInline typealias Instance = LRU
@@ -37,18 +37,23 @@ final class swift_ac_memoizeTests: XCTestCase {
                   a < b
                 }
                 @inlinable @inline(__always)
+                static func params(_ a: Int)  -> Parameters {
+                  (a)
+                }
+                @inlinable @inline(__always)
                 static func create() -> Instance {
-                  Instance(maxCount: 0)
+                  .init(maxCount: 0)
                 }
               }
               var ___cache = ___Cache.create()
               func test(_ a: Int) -> Int {
-                let args = (a)
-                if let result = ___cache[args] {
+                typealias ___C = ___Cache
+                let params = ___C.params(a)
+                if let result = ___cache[params] {
                   return result
                 }
                 let r = ___body(a)
-                ___cache[args] = r
+                ___cache[params] = r
                 return r
               }
               func ___body(_ a: Int) -> Int {
@@ -84,43 +89,48 @@ final class swift_ac_memoizeTests: XCTestCase {
         }
         """,
         expandedSource: """
-          func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              enum ___Cache: _MemoizationProtocol {
-                @usableFromInline typealias Parameters = (Int, y: Int, z: Int)
-                @usableFromInline typealias Return = Int
-                @usableFromInline typealias Instance = LRU
-                @inlinable @inline(__always)
-                static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
-                  a < b
-                }
-                @inlinable @inline(__always)
-                static func create() -> Instance {
-                  Instance(maxCount: 0)
-                }
+        func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+            enum ___Cache: _ComparableMemoizationCacheProtocol {
+              @usableFromInline typealias Parameters = (Int, y: Int, z: Int)
+              @usableFromInline typealias Return = Int
+              @usableFromInline typealias Instance = LRU
+              @inlinable @inline(__always)
+              static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
+                a < b
               }
-              var ___cache = ___Cache.create()
-              func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-                let args = (x, y: yy, z: z)
-                if let result = ___cache[args] {
-                  return result
-                }
-                let r = ___body(x, y: yy, z: z)
-                ___cache[args] = r
-                return r
+              @inlinable @inline(__always)
+              static func params(_ x: Int, y yy: Int, z: Int)  -> Parameters {
+                (x, y: yy, z: z)
               }
-              func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
-                if x <= yy {
-                  return yy
-                } else {
-                  return tarai(
-                    tarai(x - 1, y: yy, z: z),
-                    y: tarai(yy - 1, y: z, z: x),
-                    z: tarai(z - 1, y: x, z: yy))
-                }
+              @inlinable @inline(__always)
+              static func create() -> Instance {
+                .init(maxCount: 0)
               }
-              return tarai(x, y: yy, z: z)
-          }
-          """,
+            }
+            var ___cache = ___Cache.create()
+            func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+              typealias ___C = ___Cache
+              let params = ___C.params(x, y: yy, z: z)
+              if let result = ___cache[params] {
+                return result
+              }
+              let r = ___body(x, y: yy, z: z)
+              ___cache[params] = r
+              return r
+            }
+            func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
+              if x <= yy {
+                return yy
+              } else {
+                return tarai(
+                  tarai(x - 1, y: yy, z: z),
+                  y: tarai(yy - 1, y: z, z: x),
+                  z: tarai(z - 1, y: x, z: yy))
+              }
+            }
+            return tarai(x, y: yy, z: z)
+        }
+        """,
         macros: testMacros
       )
     #else
@@ -145,48 +155,53 @@ final class swift_ac_memoizeTests: XCTestCase {
         }
         """,
         expandedSource: """
-          func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-              enum ___Cache {
-                @usableFromInline struct Parameters: Hashable {
-                  init(_ x: Int, y yy: Int, z: Int) {
-                    self.x = x
-                self.y = yy
-                self.z = z
-                  }
-                  @usableFromInline let x: Int
+        func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+            enum ___Cache: _HashableMemoizationCacheProtocol {
+              @usableFromInline struct Parameters: Hashable {
+                @usableFromInline let x: Int
                 @usableFromInline let y: Int
                 @usableFromInline let z: Int
-                }
-                @usableFromInline typealias Return = Int
-                @usableFromInline typealias Instance = [Parameters: Return]
-                @inlinable @inline(__always)
-                static func create() -> Instance {
-                  [:]
+                init(_ x: Int, y yy: Int, z: Int) {
+                    self.x = x
+                    self.y = yy
+                    self.z = z
                 }
               }
-              var ___cache = ___Cache.create()
-              func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
-                let args = ___Cache.Parameters(x, y: yy, z: z)
-                if let result = ___cache[args] {
-                  return result
-                }
-                let r = ___body(x, y: yy, z: z)
-                ___cache[args] = r
-                return r
+              @usableFromInline typealias Return = Int
+              @usableFromInline typealias Instance = Standard
+              @inlinable @inline(__always)
+              static func params(_ x: Int, y yy: Int, z: Int) -> Parameters {
+                Parameters(x, y: yy, z: z)
               }
-              func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
-                if x <= yy {
-                  return yy
-                } else {
-                  return tarai(
-                    tarai(x - 1, y: yy, z: z),
-                    y: tarai(yy - 1, y: z, z: x),
-                    z: tarai(z - 1, y: x, z: yy))
-                }
+              @inlinable @inline(__always)
+              static func create() -> Instance {
+                .init()
               }
-              return tarai(x, y: yy, z: z)
-          }
-          """,
+            }
+            var ___cache = ___Cache.create()
+            func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
+              typealias ___C = ___Cache
+              let params = ___C.params(x, y: yy, z: z)
+              if let result = ___cache[params] {
+                return result
+              }
+              let r = ___body(x, y: yy, z: z)
+              ___cache[params] = r
+              return r
+            }
+            func ___body(_ x: Int, y yy: Int, z: Int) -> Int {
+              if x <= yy {
+                return yy
+              } else {
+                return tarai(
+                  tarai(x - 1, y: yy, z: z),
+                  y: tarai(yy - 1, y: z, z: x),
+                  z: tarai(z - 1, y: x, z: yy))
+              }
+            }
+            return tarai(x, y: yy, z: z)
+        }
+        """,
         macros: testMacros
       )
     #else

@@ -10,8 +10,8 @@ print(fibonacci(40)) // Output: 102_334_155
 #endif
 
 #if true
-@Memoize(maxCount: Int.max)
-//@Memoize
+//@Memoize(maxCount: Int.max)
+@Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
   if x <= y {
     return y
