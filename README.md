@@ -35,7 +35,6 @@ import AcMemoize
 
 再帰関数の先頭に@Memoizeを付け足すだけです。
 
-キャッシュの上限サイズなしの展開前です。
 ```swift
 @Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
@@ -51,111 +50,42 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
-キャッシュの上限サイズなしの展開後は以下のようになります。
-標準辞書を用いています。
 ```swift
-func tarai(x: Int, y: Int, z: Int) -> Int {
-    enum ___Cache {
-      @usableFromInline struct Parameters: Hashable {
-        init(x: Int, y: Int, z: Int) {
-          self.x = x
-          self.y = y
-          self.z = z
-        }
-        @usableFromInline let x: Int
-        @usableFromInline let y: Int
-        @usableFromInline let z: Int
-      }
-      @usableFromInline typealias Return = Int
-      @usableFromInline typealias Instance = [Parameters: Return]
-      @inlinable @inline(__always)
-      static func create() -> Instance {
-        [:]
-      }
-    }
-    var ___cache = ___Cache.create()
-    func tarai(x: Int, y: Int, z: Int) -> Int {
-      let args = ___Cache.Parameters(x: x, y: y, z: z)
-      if let result = ___cache[args] {
-        return result
-      }
-      let r = ___body(x: x, y: y, z: z)
-      ___cache[args] = r
-      return r
-    }
-    func ___body(x: Int, y: Int, z: Int) -> Int {
-      if x <= y {
-        return y
-      } else {
-        return tarai(
-          x: tarai(x: x - 1, y: y, z: z),
-          y: tarai(x: y - 1, y: z, z: x),
-          z: tarai(x: z - 1, y: x, z: y))
-      }
-    }
-    return tarai(x: x, y: y, z: z)
+@Memoize
+func fib(_ n: Int) -> Int {
+  n<2 ? n : fib(n-1) + fib(n-2)
 }
-
-print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+print((1..<16).map { fib($0) })
 ```
 
-キャッシュの上限サイズありの展開前です。
+マクロの展開は関数内部に対して行われます。
+
+## キャッシュ
+
+### 標準
+
 ```swift
-@Memoize(maxCount: 100)
-func tarai(x: Int, y: Int, z: Int) -> Int {
-  if x <= y {
-    return y
-  } else {
-    return tarai(
-      x: tarai(x: x - 1, y: y, z: z),
-      y: tarai(x: y - 1, y: z, z: x),
-      z: tarai(x: z - 1, y: x, z: y))
-  }
-}
-print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+@Memoize
+```
+引数なしの場合、引数を与えた場合、保持するキャッシュサイズは無制限となります。
+内部キャッシュにSwift標準のDictionaryを使用します。
+
+### LRU
+
+```swift
+@Memoize(maxCount: 20)
 ```
 
-キャッシュの上限サイズありの展開後は以下のようになります。
-平衡二分探索木を用いています。
+引数を与えた場合、保持するキャッシュ数を制限します。
+内部キャッシュに平衡二分探索木を用いた[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)キャッシュを使用します。
+
+
 ```swift
-func tarai(x: Int, y: Int, z: Int) -> Int {
-    enum ___Cache: _MemoizationProtocol {
-      @usableFromInline typealias Parameters = (x: Int, y: Int, z: Int)
-      @usableFromInline typealias Return = Int
-      @usableFromInline typealias Instance = Tree
-      @inlinable @inline(__always)
-      static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
-        a < b
-      }
-      @inlinable @inline(__always)
-      static func create() -> Instance {
-        .init(maxCount: 100)
-      }
-    }
-    var ___cache = ___Cache.create()
-    func tarai(x: Int, y: Int, z: Int) -> Int {
-      let args = (x: x, y: y, z: z)
-      if let result = ___cache[args] {
-        return result
-      }
-      let r = ___body(x: x, y: y, z: z)
-      ___cache[args] = r
-      return r
-    }
-    func ___body(x: Int, y: Int, z: Int) -> Int {
-      if x <= y {
-        return y
-      } else {
-        return tarai(
-          x: tarai(x: x - 1, y: y, z: z),
-          y: tarai(x: y - 1, y: z, z: x),
-          z: tarai(x: z - 1, y: x, z: y))
-      }
-    }
-    return tarai(x: x, y: y, z: z)
-}
-print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+@Memoize(maxCount: Int.max)
 ```
+
+引数に十分大きな値を与えた場合、実質無制限となりますが、
+この場合もLRUキャッシュを使用します。
 
 ## 注意事項
 
@@ -166,8 +96,6 @@ print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 - 内部にPrivete型を保持しているため、@inlinableにはできません。必要な場合、@usableFromInlineにしてください。
 
 - キャッシュサイズの上限の有無で、関数パラメータの各型が必要とする適合先が変わります。ナシの場合はHashable、アリの場合はComparableとなります。
-
-- キャッシュサイズの上限値をInt.maxとすることで、意図的に標準辞書ではなく、平衡二分探索木をキャッシュに利用することが可能です。
 
 ## ライセンス
 
