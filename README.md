@@ -35,8 +35,8 @@ import AcMemoize
 
 再帰関数の先頭に@Memoizeを付け足すだけです。
 
+キャッシュの上限サイズなしの展開前です。
 ```swift
-
 @Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
   if x <= y {
@@ -51,65 +51,123 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
-上のソースコードは、おおよそ以下のように展開されます。
+キャッシュの上限サイズなしの展開後は以下のようになります。
+標準辞書を用いています。
 ```swift
-static func tarai(x: Int, y: Int, z: Int) -> Int {
-  
-  typealias Args = (x: Int, y: Int, z: Int)
-  
-  enum Key: CustomKeyProtocol {
-    @inlinable @inline(__always)
-    static func value_comp(_ a: Args, _ b: Args) -> Bool { a < b }
-  }
-  
-  var storage: MemoizeCacheBase<Key, Int> = .init()
-  
-  func tarai(x: Int, y: Int, z: Int) -> Int {
-    let args = (x,y,z)
-    if let result = storage[args] {
-      return result
+func tarai(x: Int, y: Int, z: Int) -> Int {
+    enum ___Cache {
+      @usableFromInline struct Parameters: Hashable {
+        init(x: Int, y: Int, z: Int) {
+          self.x = x
+          self.y = y
+          self.z = z
+        }
+        @usableFromInline let x: Int
+        @usableFromInline let y: Int
+        @usableFromInline let z: Int
+      }
+      @usableFromInline typealias Return = Int
+      @usableFromInline typealias Instance = [Parameters: Return]
+      @inlinable @inline(__always)
+      static func create() -> Instance {
+        [:]
+      }
     }
-    let r = body(x: x, y: y, z: z)
-    storage[args] = r
-    return r
-  }
-  
-  func body(x: Int, y: Int, z: Int) -> Int {
-    if x <= y {
-      return y
-    } else {
-      return tarai(
-        x: tarai(x: x - 1, y: y, z: z),
-        y: tarai(x: y - 1, y: z, z: x),
-        z: tarai(x: z - 1, y: x, z: y))
+    var ___cache = ___Cache.create()
+    func tarai(x: Int, y: Int, z: Int) -> Int {
+      let args = ___Cache.Parameters(x: x, y: y, z: z)
+      if let result = ___cache[args] {
+        return result
+      }
+      let r = ___body(x: x, y: y, z: z)
+      ___cache[args] = r
+      return r
     }
-  }
-  
-  return tarai(x: x, y: y, z: z)
+    func ___body(x: Int, y: Int, z: Int) -> Int {
+      if x <= y {
+        return y
+      } else {
+        return tarai(
+          x: tarai(x: x - 1, y: y, z: z),
+          y: tarai(x: y - 1, y: z, z: x),
+          z: tarai(x: z - 1, y: x, z: y))
+      }
+    }
+    return tarai(x: x, y: y, z: z)
 }
 
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
-フィボナッチ数は以下のように書けます。
+キャッシュの上限サイズありの展開前です。
 ```swift
-@Memoize
-func fibonacci(_ n: Int) -> Int {
-    if n <= 1 { return n }
-    return fibonacci(n - 1) + fibonacci(n - 2)
+@Memoize(maxCount: 100)
+func tarai(x: Int, y: Int, z: Int) -> Int {
+  if x <= y {
+    return y
+  } else {
+    return tarai(
+      x: tarai(x: x - 1, y: y, z: z),
+      y: tarai(x: y - 1, y: z, z: x),
+      z: tarai(x: z - 1, y: x, z: y))
+  }
 }
-print(fibonacci(40)) // Output: 102_334_155
+print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+```
+
+キャッシュの上限サイズありの展開後は以下のようになります。
+平衡二分探索木を用いています。
+```swift
+func tarai(x: Int, y: Int, z: Int) -> Int {
+    enum ___Cache: _MemoizationProtocol {
+      @usableFromInline typealias Parameters = (x: Int, y: Int, z: Int)
+      @usableFromInline typealias Return = Int
+      @usableFromInline typealias Instance = Tree
+      @inlinable @inline(__always)
+      static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
+        a < b
+      }
+      @inlinable @inline(__always)
+      static func create() -> Instance {
+        .init(maxCount: 100)
+      }
+    }
+    var ___cache = ___Cache.create()
+    func tarai(x: Int, y: Int, z: Int) -> Int {
+      let args = (x: x, y: y, z: z)
+      if let result = ___cache[args] {
+        return result
+      }
+      let r = ___body(x: x, y: y, z: z)
+      ___cache[args] = r
+      return r
+    }
+    func ___body(x: Int, y: Int, z: Int) -> Int {
+      if x <= y {
+        return y
+      } else {
+        return tarai(
+          x: tarai(x: x - 1, y: y, z: z),
+          y: tarai(x: y - 1, y: z, z: x),
+          z: tarai(x: z - 1, y: x, z: y))
+      }
+    }
+    return tarai(x: x, y: y, z: z)
+}
+print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
 ## 注意事項
 
 - コンパイル環境に載らないと利用できないため、AC実績はまだありません。
 
-- メモ化キャッシュは関数開始時に作成され、関数終了時に開放されます。このため、再帰関数以外でメモ化を利用することができません。
+- メモ化キャッシュは関数開始時に作成され、関数終了時に開放されます。このため、再帰関数以外でキャッシュ化を利用することはできません。
 
 - 内部にPrivete型を保持しているため、@inlinableにはできません。必要な場合、@usableFromInlineにしてください。
 
-- タプルに混ぜた際に、タプル同士の比較が利用できなくなるような型は再帰関数の引数に利用できません。任意型を利用する際は、Comparableに適合してみてください。
+- キャッシュサイズの上限の有無で、関数パラメータの各型が必要とする適合先が変わります。ナシの場合はHashable、アリの場合はComparableとなります。
+
+- キャッシュサイズの上限値をInt.maxとすることで、意図的に標準辞書ではなく、平衡二分探索木をキャッシュに利用することが可能です。
 
 ## ライセンス
 

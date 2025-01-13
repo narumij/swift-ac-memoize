@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.7] - 2025-1-13
+### Changed
+- キャッシュを標準辞書とLRU専用コンテナの併用に変更
+
 ## [0.0.6] - 2025-1-8
 ### Changed
 - swift-ac-collectionの依存バージョンを0.1.4に変更
