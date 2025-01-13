@@ -201,22 +201,10 @@ func returnType(_ funcDecl: FunctionDeclSyntax) -> TypeSyntax {
 }
 
 func maxCount(_ node: AttributeSyntax) -> String? {
-  var maxCount: String?
-  let arguments = node.arguments?.as(LabeledExprListSyntax.self) ?? []
-  for argument in arguments {
+  for argument in node.arguments?.as(LabeledExprListSyntax.self) ?? [] {
     if let label = argument.label?.text, label == "maxCount" {
-      if let valueExpr = argument.expression.as(IntegerLiteralExprSyntax.self) {
-        maxCount = valueExpr.literal.text
-        break
-      }
-      if argument.expression.is(NilLiteralExprSyntax.self) {
-        maxCount = "nil"
-      }
+      return argument.expression.description
     }
   }
-  return maxCount ?? (isLRU(node) ? "nil" : nil)
-}
-
-func isLRU(_ node: AttributeSyntax) -> Bool {
-  node.description.lowercased().contains("lru")
+  return nil
 }
