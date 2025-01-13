@@ -76,7 +76,7 @@ final class swift_ac_memoizeTests: XCTestCase {
     #if canImport(swift_ac_memoizeMacros)
       assertMacroExpansion(
         """
-        @Memoize(maxCount: 0)
+        @Memoize(maxCount: Int.max)
         func tarai(_ x: Int, y yy: Int, z: Int) -> Int {
           if x <= yy {
             return yy
@@ -104,7 +104,7 @@ final class swift_ac_memoizeTests: XCTestCase {
               }
               @inlinable @inline(__always)
               static func create() -> Instance {
-                .init(maxCount: 0)
+                .init(maxCount: Int.max)
               }
             }
             var ___cache = ___Cache.create()

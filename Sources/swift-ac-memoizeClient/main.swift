@@ -10,7 +10,7 @@ print((1..<16).map { fibonacci($0) }) // Output: [1, 1, 2, 3, 5, 8, 13, 21, 34, 
 print(fibonacci(40)) // Output: 102_334_155
 #endif
 
-#if false
+#if true
 //@Memoize(maxCount: Int.max)
 @Memoize
 func tarai(x: Int, y: Int, z: Int) -> Int {
