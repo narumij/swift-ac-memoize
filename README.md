@@ -13,6 +13,10 @@ SwiftPMで swift-ac-libraryを利用する場合は、
 
 以下をPackage.swift に追加してください。
 ```
+platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
+```
+
+```
 dependencies: [
   .package(url: "https://github.com/narumij/swift-ac-memoize.git", from: "0.1.0"),
 ],
