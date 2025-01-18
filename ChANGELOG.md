@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-1-18
 ### Changed
 - バージョン番号の変更
+- 依存パッケージバージョンの固定
 
 ## [0.0.8] - 2025-1-13
 ### Fixed

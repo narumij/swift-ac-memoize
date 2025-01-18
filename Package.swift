@@ -12,12 +12,15 @@ let package = Package(
     .library(
       name: "AcMemoize",
       targets: ["AcMemoize"]
-    ),
+    )
   ],
   dependencies: [
-    .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0-latest"),
-    .package(url: "https://github.com/narumij/swift-ac-collections.git",
-             from: "0.1.6"),
+    .package(
+      url: "https://github.com/swiftlang/swift-syntax.git",
+      from: "600.0.1"),
+    .package(
+      url: "https://github.com/narumij/swift-ac-collections.git",
+      exact: "0.1.6"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -52,7 +55,7 @@ let package = Package(
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ]
     ),
-    
+
     .testTarget(name: "tests", dependencies: ["AcMemoize"]),
   ]
 )
