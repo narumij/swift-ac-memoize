@@ -20,7 +20,7 @@ let package = Package(
       from: "600.0.1"),
     .package(
       url: "https://github.com/narumij/swift-ac-collections.git",
-      exact: "0.1.6"),
+      exact: "0.1.7"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
