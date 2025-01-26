@@ -16,11 +16,11 @@ let package = Package(
   ],
   dependencies: [
     .package(
-      url: "https://github.com/swiftlang/swift-syntax.git",
+      url: "https://github.com/swiftlang/swift-syntax",
       from: "600.0.1"),
     .package(
-      url: "https://github.com/narumij/swift-ac-collections.git",
-      exact: "0.1.7"),
+      url: "https://github.com/narumij/swift-ac-collections",
+      exact: "0.1.10"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
