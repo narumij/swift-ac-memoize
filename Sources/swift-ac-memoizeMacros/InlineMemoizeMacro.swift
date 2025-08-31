@@ -4,7 +4,6 @@ import SwiftSyntaxBuilder
 @_spi(Testing) import SwiftSyntaxMacroExpansion
 import SwiftSyntaxMacros
 
-// swift-ac-memoizeと同じもの
 public struct InlineMemoizeMacro: BodyMacro {
 
   public static func expansion(
