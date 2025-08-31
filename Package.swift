@@ -6,7 +6,7 @@ import PackageDescription
 
 let package = Package(
   name: "swift-ac-memoize",
-  platforms: [.macOS(.v15)],
+  platforms: [.macOS(.v14)],
   products: [
     // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
@@ -20,7 +20,7 @@ let package = Package(
       exact: "601.0.1"),
     .package(
       url: "https://github.com/narumij/swift-ac-collections",
-      branch: "release/AtCoder/2025"),
+      exact: "0.1.42"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
