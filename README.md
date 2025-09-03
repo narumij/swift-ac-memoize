@@ -13,12 +13,13 @@ SwiftPMで swift-ac-libraryを利用する場合は、
 
 以下をPackage.swift に追加してください。
 ```
-platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
+platforms: [.macOS(.v14)]
 ```
 
 ```
 dependencies: [
-  .package(url: "https://github.com/narumij/swift-ac-memoize.git", from: "0.1.0"),
+  .package(url: "https://github.com/narumij/swift-ac-memoize.git",
+   branch: "release/AtCoder/2025"),
 ],
 ```
 
@@ -91,9 +92,9 @@ print((1..<16).map { fib($0) })
 引数に十分大きな値を与えた場合、実質無制限となりますが、
 この場合もLRUキャッシュを使用します。
 
-## 注意事項
+- [AC例](https://atcoder.jp/contests/language-test-202505/submissions/69021295)
 
-- コンパイル環境に載らないと利用できないため、AC実績はまだありません。
+## 注意事項
 
 - メモ化キャッシュは関数開始時に作成され、関数終了時に開放されます。このため、再帰関数以外でキャッシュ化を利用することはできません。
 
