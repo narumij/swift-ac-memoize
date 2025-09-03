@@ -18,7 +18,7 @@ platforms: [.macOS(.v14)]
 
 ```
 dependencies: [
-  .package(url: "https://github.com/narumij/swift-ac-memoize.git",
+  .package(url: "https://github.com/narumij/swift-ac-memoize",
    branch: "release/AtCoder/2025"),
 ],
 ```
