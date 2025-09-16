@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import CompilerPluginSupport
@@ -17,7 +17,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/swiftlang/swift-syntax",
-      exact: "601.0.1"),
+      exact: "602.0.0"),
     .package(
       url: "https://github.com/narumij/swift-ac-collections",
       from: "0.1.43"),
