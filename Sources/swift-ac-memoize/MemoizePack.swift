@@ -55,19 +55,4 @@ extension MemoizePack: Hashable where repeat each T: Hashable {
   }
 }
 
-extension MemoizePack: _KeyCustomProtocol where repeat each T: Comparable {
-
-  @inlinable @inline(__always)
-  public static func value_comp(
-    _ lhs: MemoizePack<repeat each T>, _ rhs: MemoizePack<repeat each T>
-  ) -> Bool {
-    for (l, r) in repeat (each lhs.rawValue, each rhs.rawValue) {
-      if l != r {
-        return l < r
-      }
-    }
-    return false
-  }
-}
-
 extension MemoizePack: Sendable where repeat each T: Sendable { }
