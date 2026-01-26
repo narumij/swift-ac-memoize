@@ -20,7 +20,7 @@ let package = Package(
       exact: "602.0.0"),
     .package(
       url: "https://github.com/narumij/swift-ac-collections",
-      from: "0.2.0"),
+      branch: "compatible/AtCoder/2025"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
