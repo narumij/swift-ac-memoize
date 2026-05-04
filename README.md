@@ -1,44 +1,49 @@
 # swift-ac-memoize
 
-`swift-ac-memoize` is an open-source package of memoized recursion macros for competitive programming on [AtCoder][atcoder].
+English | [日本語](README.ja.md)
 
-`swift-ac-memoize` は、[AtCoder][atcoder]での利用を想定したメモ化再帰マクロのオープソース・パッケージです。
+`swift-ac-memoize` is an open-source package providing memoized recursion macros designed for competitive programming on [AtCoder][atcoder].
 
 [![Swift](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml)  
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## 利用の仕方
+## Usage
 
-SwiftPMで swift-ac-libraryを利用する場合は、
+To use `swift-ac-memoize` with SwiftPM, add the following to your `Package.swift`.
 
-以下をPackage.swift に追加してください。
-```
+First, specify the platform:
+
+```swift
 platforms: [.macOS(.v14)]
 ```
 
-```
+Add the dependency:
+
+```swift
 dependencies: [
-  .package(url: "https://github.com/narumij/swift-ac-memoize",
-   branch: "release/AtCoder/2025"),
+  .package(
+    url: "https://github.com/narumij/swift-ac-memoize",
+    branch: "release/AtCoder/2025"),
 ],
 ```
 
-ビルドターゲットに以下を追加します。
+Add it to your target:
 
-```
-  dependencies: [
-    .product(name: "AcMemoize", package: "swift-ac-memoize")
-  ]
+```swift
+dependencies: [
+  .product(name: "AcMemoize", package: "swift-ac-memoize")
+]
 ```
 
-ソースコードに以下を追加します。
-```
+Import in your source code:
+
+```swift
 import AcMemoize
 ```
 
-## 使い方
+## Usage
 
-再帰関数の先頭に@Memoizeを付け足すだけです。
+Simply add `@Memoize` at the beginning of a recursive function.
 
 ```swift
 @Memoize
@@ -52,28 +57,29 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
       z: tarai(x: z - 1, y: x, z: y))
   }
 }
-print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
+print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // Output: 20
 ```
 
 ```swift
 @Memoize
 func fib(_ n: Int) -> Int {
-  n<2 ? n : fib(n-1) + fib(n-2)
+  n < 2 ? n : fib(n - 1) + fib(n - 2)
 }
 print((1..<16).map { fib($0) })
 ```
 
-マクロの展開は関数内部に対して行われます。
+The macro expansion is applied inside the function body.
 
-## キャッシュ
+## Cache
 
-### 標準
+### Default
 
 ```swift
 @Memoize
 ```
-引数なしの場合、保持するキャッシュサイズは無制限となります。
-内部キャッシュにSwift標準のDictionaryを使用します。
+
+If no arguments are provided, the cache size is unlimited.  
+The internal cache uses Swift’s standard `Dictionary`.
 
 ### LRU
 
@@ -81,30 +87,31 @@ print((1..<16).map { fib($0) })
 @Memoize(maxCount: 20)
 ```
 
-引数を与えた場合、保持するキャッシュ数を制限します。
-内部キャッシュに平衡二分探索木を用いた[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU))キャッシュを使用します。
-
+If an argument is provided, the cache size is limited.  
+An [LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)) cache implemented with a balanced binary search tree is used internally.
 
 ```swift
 @Memoize(maxCount: Int.max)
 ```
 
-引数に十分大きな値を与えた場合、実質無制限となりますが、
-この場合もLRUキャッシュを使用します。
+If a sufficiently large value is given, it effectively behaves as unlimited, but still uses the LRU cache.
 
-- [AC例](https://atcoder.jp/contests/language-test-202505/submissions/69021295)
+- [AC example](https://atcoder.jp/contests/language-test-202505/submissions/69021295)
 
-## 注意事項
+## Notes
 
-- メモ化キャッシュは関数開始時に作成され、関数終了時に開放されます。このため、再帰関数以外でキャッシュ化を利用することはできません。
+- The memoization cache is created at the beginning of the function and released when the function exits.  
+  Therefore, it cannot be used for non-recursive caching.
 
-- 内部にPrivete型を保持しているため、@inlinableにはできません。必要な場合、@usableFromInlineにしてください。
+- Since the implementation uses private types internally, it cannot be marked as `@inlinable`.  
+  Use `@usableFromInline` if necessary.
 
-- キャッシュサイズの上限の有無で、関数パラメータの各型が必要とする適合先が変わります。ナシの場合はHashable、アリの場合はComparableとなります。
+- The required protocol conformance for function parameters depends on whether a cache size limit is specified:
+  - No limit → `Hashable`
+  - With limit → `Comparable`
 
-## ライセンス
+## License
 
-このライブラリは [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) に基づいて配布しています。  
+This library is distributed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 [atcoder]: https://atcoder.jp/
-
