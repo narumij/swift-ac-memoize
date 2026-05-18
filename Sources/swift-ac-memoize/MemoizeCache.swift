@@ -60,7 +60,6 @@ extension MemoizeCache {
 
     @nonobjc
     @inlinable
-    @inline(__always)
     public init() {
       self.storage = .init()
     }
@@ -114,7 +113,6 @@ extension MemoizeCache {
   {
     @nonobjc
     @inlinable
-    @inline(__always)
     public init(maxCount: Int) {
       self.storage = .init(maxCount: maxCount)
     }

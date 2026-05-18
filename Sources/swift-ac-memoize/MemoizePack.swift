@@ -8,12 +8,12 @@ public struct MemoizePack<each T> {
   public
     var rawValue: RawValue
 
-  @inlinable @inline(__always)
+  @inlinable
   public init(rawValue: (repeat each T)) {
     self.rawValue = (repeat each rawValue)
   }
 
-  @inlinable @inline(__always)
+  @inlinable
   public init(_ rawValue: repeat each T) {
     self.rawValue = (repeat each rawValue)
   }
@@ -21,7 +21,7 @@ public struct MemoizePack<each T> {
 
 extension MemoizePack: Equatable where repeat each T: Equatable {
 
-  @inlinable @inline(__always)
+  @inlinable
   public static func == (lhs: MemoizePack<repeat each T>, rhs: MemoizePack<repeat each T>) -> Bool {
     for (l, r) in repeat (each lhs.rawValue, each rhs.rawValue) {
       if l != r {
@@ -34,7 +34,7 @@ extension MemoizePack: Equatable where repeat each T: Equatable {
 
 extension MemoizePack: Comparable where repeat each T: Comparable {
 
-  @inlinable @inline(__always)
+  @inlinable
   public static func < (lhs: MemoizePack<repeat each T>, rhs: MemoizePack<repeat each T>) -> Bool {
     for (l, r) in repeat (each lhs.rawValue, each rhs.rawValue) {
       if l != r {
@@ -47,7 +47,7 @@ extension MemoizePack: Comparable where repeat each T: Comparable {
 
 extension MemoizePack: Hashable where repeat each T: Hashable {
 
-  @inlinable @inline(__always)
+  @inlinable
   public func hash(into hasher: inout Hasher) {
     for l in repeat (each rawValue) {
       hasher.combine(l)

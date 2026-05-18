@@ -84,11 +84,11 @@ func hashCache(_ funcDecl: FunctionDeclSyntax) -> DeclSyntax {
       @usableFromInline \(structParameters("Parameters", funcDecl.signature.parameterClause))
       @usableFromInline typealias Return = \(returnType(funcDecl))
       @usableFromInline typealias Instance = Standard
-      @inlinable @inline(__always)
+      @inlinable
       static func params\(funcDecl.signature.parameterClause)-> Parameters {
         Parameters(\(paramsExpr(funcDecl)))
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func create() -> Instance {
         .init()
       }
@@ -102,15 +102,15 @@ func lruCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> DeclSy
       @usableFromInline typealias Parameters = (\(raw: tupleTypeElement(funcDecl)))
       @usableFromInline typealias Return = \(returnType(funcDecl))
       @usableFromInline typealias Instance = LRU
-      @inlinable @inline(__always)
+      @inlinable
       static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
         a < b
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func params\(funcDecl.signature.parameterClause) -> Parameters {
         (\(paramsExpr(funcDecl)))
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func create() -> Instance {
         .init(maxCount: \(raw: limit ?? "Int.max"))
       }
@@ -124,15 +124,15 @@ func cowCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> DeclSy
       @usableFromInline typealias Parameters = (\(raw: tupleTypeElement(funcDecl)))
       @usableFromInline typealias Return = \(returnType(funcDecl))
       @usableFromInline typealias Instance = CoW
-      @inlinable @inline(__always)
+      @inlinable
       static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
         a < b
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func params\(funcDecl.signature.parameterClause) -> Parameters {
         (\(paramsExpr(funcDecl)))
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func create() -> Instance {
         .init(maxCount: \(raw: limit ?? "Int.max"))
       }
@@ -146,15 +146,15 @@ func baseCache(_ funcDecl: FunctionDeclSyntax, maxCount limit: String?) -> DeclS
       @usableFromInline typealias Parameters = (\(raw: tupleTypeElement(funcDecl)))
       @usableFromInline typealias Return = \(returnType(funcDecl))
       @usableFromInline typealias Instance = Base
-      @inlinable @inline(__always)
+      @inlinable
       static func value_comp(_ a: Parameters, _ b: Parameters) -> Bool {
         a < b
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func params\(funcDecl.signature.parameterClause) -> Parameters {
         (\(paramsExpr(funcDecl)))
       }
-      @inlinable @inline(__always)
+      @inlinable
       static func create() -> Instance {
         .init()
       }
