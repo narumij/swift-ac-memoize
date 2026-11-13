@@ -1,25 +1,22 @@
 # swift-ac-memoize
 
-`swift-ac-memoize` is an open-source package of memoized recursion macros for competitive programming on [AtCoder][atcoder].
+[English](README.md) | 日本語
 
-`swift-ac-memoize` は、[AtCoder][atcoder]での利用を想定したメモ化再帰マクロのオープソース・パッケージです。
+`swift-ac-memoize` は、[Memoization][memoization]のメモ化マクロと、[swift-ac-collections][collections]のコンテナをつなぐパッケージです。
 
 [![Swift](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml/badge.svg?branch=main)](https://github.com/narumij/swift-ac-memoize/actions/workflows/swift.yml)  
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## 利用の仕方
 
-SwiftPMで swift-ac-libraryを利用する場合は、
-
 以下をPackage.swift に追加してください。
 ```
-platforms: [.macOS(.v14)]
+platforms: [.macOS(.v15)]
 ```
 
 ```
 dependencies: [
-  .package(url: "https://github.com/narumij/swift-ac-memoize",
-   branch: "release/AtCoder/2025"),
+  .package(url: "https://github.com/narumij/swift-ac-memoize", branch: "main"),
 ],
 ```
 
@@ -36,9 +33,21 @@ dependencies: [
 import AcMemoize
 ```
 
+`AcMemoize`は`Memoization`を再エクスポートします。
+
+### AtCoder 2025 のジャッジ
+
+AtCoder 2025 のジャッジ環境向けの旧版は、`compatible/AtCoder/2025`ブランチにあります。
+
+```
+dependencies: [
+  .package(url: "https://github.com/narumij/swift-ac-memoize", branch: "compatible/AtCoder/2025"),
+],
+```
+
 ## 使い方
 
-再帰関数の先頭に@Memoizeを付け足すだけです。
+`@Memoize`、`@Memoizable`、`Memo<...>.Cache<...>`の使い方は[Memoization][memoization]と同じです。
 
 ```swift
 @Memoize
@@ -55,56 +64,74 @@ func tarai(x: Int, y: Int, z: Int) -> Int {
 print("Tak 20 10 0 is \(tarai(x: 20, y: 10, z: 0))") // 出力: 20
 ```
 
+このパッケージは、swift-ac-collectionsのコンテナを`MemoCache`に適合させます。
+`cache:`付きの関数に渡すと、キャッシュに使えます。
+
+## 使えるキャッシュ
+
+### RedBlackTreeDictionary
+
+赤黒木の辞書です。引数の型は`Comparable`であれば使えます。
+
 ```swift
-@Memoize
-func fib(_ n: Int) -> Int {
-  n<2 ? n : fib(n-1) + fib(n-2)
+@Memoizable
+func paths(_ p: Point) -> Int {
+  p.x == 0 || p.y == 0 ? 1 : paths(Point(x: p.x - 1, y: p.y)) + paths(Point(x: p.x, y: p.y - 1))
 }
-print((1..<16).map { fib($0) })
+
+var cache = Memo<Point, Int>.Cache<RedBlackTreeDictionary>()
+paths(Point(x: 16, y: 16), cache: &cache)
 ```
 
-マクロの展開は関数内部に対して行われます。
+### LRUCache
 
-## キャッシュ
-
-### 標準
+保持する数を制限する[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU))キャッシュです。
+引数の型は`Comparable`であれば使えます。コピーできない型です。
 
 ```swift
-@Memoize
+var cache = Memo<Point, Int>.Cache<LRUCache>(maxCount: 64)
+paths(Point(x: 16, y: 16), cache: &cache)
 ```
-引数なしの場合、保持するキャッシュサイズは無制限となります。
-内部キャッシュにSwift標準のDictionaryを使用します。
 
-### LRU
+swift-ac-collectionsでは実験的な型のため、APIが変わることがあります。
+
+### OptionalElementBuffer
+
+`Int`の引数を添字にする配列です。1次元から4次元まであります。
+引数の範囲に合わせて大きさを決めます。
 
 ```swift
-@Memoize(maxCount: 20)
+@Memoizable
+func fib(_ n: Int) -> Int {
+  n < 2 ? n : fib(n - 1) + fib(n - 2)
+}
+
+var cache = Memo<Int, Int>.Cache<OptionalElementBuffer>(capacity: 91)
+fib(90, cache: &cache)
 ```
-
-引数を与えた場合、保持するキャッシュ数を制限します。
-内部キャッシュに平衡二分探索木を用いた[LRU (least recently used)](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU))キャッシュを使用します。
-
 
 ```swift
-@Memoize(maxCount: Int.max)
+var cache = Memo<Int, Int, Int, Double>.Cache<OptionalElementBuffer3D>(width: 11, height: 11, depth: 11)
 ```
 
-引数に十分大きな値を与えた場合、実質無制限となりますが、
-この場合もLRUキャッシュを使用します。
+## トレイト
 
-- [AC例](https://atcoder.jp/contests/language-test-202505/submissions/69021295)
+`LRUCache`と`OptionalElementBuffer`の接続は、トレイトで切り替えます。どちらも既定で有効です。
 
-## 注意事項
+| トレイト | 内容 |
+| --- | --- |
+| `ENABLE_EXPERIMENTAL_LRU` | `LRUCache`を接続します |
+| `ENABLE_OPTIONAL_ELEMENT_BUFFER` | `OptionalElementBuffer`を接続します |
 
-- メモ化キャッシュは関数開始時に作成され、関数終了時に開放されます。このため、再帰関数以外でキャッシュ化を利用することはできません。
+無効にする場合は、依存の指定でトレイトを選びます。
 
-- 内部にPrivete型を保持しているため、@inlinableにはできません。必要な場合、@usableFromInlineにしてください。
-
-- キャッシュサイズの上限の有無で、関数パラメータの各型が必要とする適合先が変わります。ナシの場合はHashable、アリの場合はComparableとなります。
+```
+.package(url: "https://github.com/narumij/swift-ac-memoize", branch: "main", traits: []),
+```
 
 ## ライセンス
 
 このライブラリは [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) に基づいて配布しています。  
 
-[atcoder]: https://atcoder.jp/
-
+[memoization]: https://github.com/narumij/Memoization
+[collections]: https://github.com/narumij/swift-ac-collections
