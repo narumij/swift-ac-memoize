@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- MemoizationとAcCollectionsをつなぐ構成に刷新
+- マクロ本体と`MemoCache`をMemoizationへ移し、`AcMemoize`から再エクスポート
+- `RedBlackTreeDictionary`を`MemoCache`に適合
+- AtCoder 2025のジャッジ向けの旧版を`compatible/AtCoder/2025`ブランチに移動
+
+### Added
+- トレイト`ENABLE_EXPERIMENTAL_LRU`で、`LRUCache`を`MemoCache`に適合
+- トレイト`ENABLE_OPTIONAL_ELEMENT_BUFFER`で、`OptionalElementBuffer`の1次元から4次元までを`MemoCache`に適合
+- 両トレイトを既定で有効化
+
+### Removed
+- `@Memoize(maxCount:)`。上限付きのキャッシュは`Memo<...>.Cache<LRUCache>(maxCount:)`を渡す
+
 ## [0.1.5] - 2025-2-1
 ### Changed
 - swift-ac-collectionsのバージョンを更新
