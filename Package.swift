@@ -23,9 +23,10 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "/Users/narumij/Documents/GitHub/Memoization"),
+    .package(url: "https://github.com/narumij/Memoization", branch: "main"),
     .package(
-      path: "/Users/narumij/Documents/GitHub/swift-ac-collections",
+      url: "https://github.com/narumij/swift-ac-collections",
+      branch: "main",
       traits: [
         .trait(name: "ENABLE_EXPERIMENTAL_LRU", condition: .when(traits: ["ENABLE_EXPERIMENTAL_LRU"])),
         .trait(
