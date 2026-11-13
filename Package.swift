@@ -12,6 +12,7 @@ let package = Package(
     )
   ],
   traits: [
+    .default(enabledTraits: ["ENABLE_EXPERIMENTAL_LRU", "ENABLE_OPTIONAL_ELEMENT_BUFFER"]),
     .trait(
       name: "ENABLE_EXPERIMENTAL_LRU",
       description: "Connect the experimental noncopyable LRUCache of swift-ac-collections."
