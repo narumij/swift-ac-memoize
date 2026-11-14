@@ -1,61 +1,57 @@
 // swift-tools-version: 6.2
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
-import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
   name: "swift-ac-memoize",
   platforms: [.macOS(.v15)],
   products: [
-    // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
       name: "AcMemoize",
       targets: ["AcMemoize"]
     )
   ],
+  traits: [
+    .default(enabledTraits: ["ENABLE_EXPERIMENTAL_LRU", "ENABLE_OPTIONAL_ELEMENT_BUFFER"]),
+    .trait(
+      name: "ENABLE_EXPERIMENTAL_LRU",
+      description: "Connect the experimental noncopyable LRUCache of swift-ac-collections."
+    ),
+    .trait(
+      name: "ENABLE_OPTIONAL_ELEMENT_BUFFER",
+      description: "Connect OptionalElementBuffer of swift-ac-collections."
+    ),
+  ],
   dependencies: [
-    .package(
-      url: "https://github.com/swiftlang/swift-syntax",
-      exact: "602.0.0"),
+    .package(url: "https://github.com/narumij/Memoization", branch: "main"),
     .package(
       url: "https://github.com/narumij/swift-ac-collections",
-      branch: "compatible/AtCoder/2025"),
+      branch: "main",
+      traits: [
+        .trait(name: "ENABLE_EXPERIMENTAL_LRU", condition: .when(traits: ["ENABLE_EXPERIMENTAL_LRU"])),
+        .trait(
+          name: "ENABLE_OPTIONAL_ELEMENT_BUFFER", condition: .when(traits: ["ENABLE_OPTIONAL_ELEMENT_BUFFER"])),
+      ]),
   ],
   targets: [
-    // Targets are the basic building blocks of a package, defining a module or a test suite.
-    // Targets can depend on other targets in this package and products from dependencies.
-    // Macro implementation that performs the source transformation of a macro.
-    .macro(
-      name: "swift-ac-memoizeMacros",
-      dependencies: [
-        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
-      ]
-    ),
-
-    // Library that exposes a macro as part of its API, which is used in client programs.
     .target(
       name: "AcMemoize",
       dependencies: [
-        "swift-ac-memoizeMacros",
+        .product(name: "Memoization", package: "Memoization"),
         .product(name: "AcCollections", package: "swift-ac-collections"),
       ],
-      path: "Sources/swift-ac-memoize/"
-    ),
-
-    // A client of the library, which is able to use the macro in its own code.
-    .executableTarget(name: "swift-ac-memoizeClient", dependencies: ["AcMemoize"]),
-
-    // A test target used to develop the macro implementation.
-    .testTarget(
-      name: "swift-ac-memoizeTests",
-      dependencies: [
-        "swift-ac-memoizeMacros",
-        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+      swiftSettings: [
+        .define("ENABLE_EXPERIMENTAL_LRU", .when(traits: ["ENABLE_EXPERIMENTAL_LRU"])),
+        .define("ENABLE_OPTIONAL_ELEMENT_BUFFER", .when(traits: ["ENABLE_OPTIONAL_ELEMENT_BUFFER"])),
       ]
     ),
-
-    .testTarget(name: "tests", dependencies: ["AcMemoize"]),
+    .testTarget(
+      name: "AcMemoizeTests",
+      dependencies: ["AcMemoize"],
+      swiftSettings: [
+        .define("ENABLE_EXPERIMENTAL_LRU", .when(traits: ["ENABLE_EXPERIMENTAL_LRU"])),
+        .define("ENABLE_OPTIONAL_ELEMENT_BUFFER", .when(traits: ["ENABLE_OPTIONAL_ELEMENT_BUFFER"])),
+      ]
+    ),
   ]
 )

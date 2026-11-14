@@ -8,3 +8,8 @@ DerivedData/
 .netrc
 .swiftpm/
 Package.resolved
+
+# Private Studio workspace and local artifacts.
+/Maintanance/
+/artifacts/
+.swift-version
