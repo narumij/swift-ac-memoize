@@ -11,14 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - マクロ本体と`MemoCache`をMemoizationへ移し、`AcMemoize`から再エクスポート
 - `RedBlackTreeDictionary`を`MemoCache`に適合
 - AtCoder 2025のジャッジ向けの旧版を`compatible/AtCoder/2025`ブランチに移動
+- `OptionalElementBuffer`のキーを、Memoizationの引数の数ごとのキーに合わせる（1次元は`Int`、2〜4次元は`MemoizePack2`〜`MemoizePack4`）
 
 ### Added
 - トレイト`ENABLE_EXPERIMENTAL_LRU`で、`LRUCache`を`MemoCache`に適合
 - トレイト`ENABLE_OPTIONAL_ELEMENT_BUFFER`で、`OptionalElementBuffer`の1次元から4次元までを`MemoCache`に適合
 - 両トレイトを既定で有効化
+- 辞書で引くLRUキャッシュ`HashLRUCache`
 
 ### Removed
-- `@Memoize(maxCount:)`。上限付きのキャッシュは`Memo<...>.Cache<LRUCache>(maxCount:)`を渡す
+- `@Memoize(maxCount:)`。上限付きのキャッシュは`関数名Cache<LRUCache>(maxCount:)`を渡す
 
 ## [0.2.3] - 2026-5-5
 ### Changed

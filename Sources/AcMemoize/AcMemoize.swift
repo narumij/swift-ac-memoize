@@ -9,56 +9,38 @@ extension RedBlackTreeDictionary: @retroactive MemoCache {}
 
 #if ENABLE_OPTIONAL_ELEMENT_BUFFER
   extension OptionalElementBuffer: @retroactive MemoCache {
-    public typealias Key = MemoizePack<Int>
+    public typealias Key = Int
     public typealias Value = Element
     public subscript(key: Key) -> Element? {
-      get { element(at: key.rawValue) }
-      nonmutating set { setElement(newValue, at: key.rawValue) }
+      get { element(at: key) }
+      nonmutating set { setElement(newValue, at: key) }
     }
   }
 
   extension OptionalElementBuffer2D: @retroactive MemoCache {
-    public typealias Key = MemoizePack<Int, Int>
+    public typealias Key = MemoizePack2<Int, Int>
     public typealias Value = Element
     public subscript(key: Key) -> Element? {
-      get {
-        let (x, y) = key.rawValue
-        return element(at: x, y)
-      }
-      nonmutating set {
-        let (x, y) = key.rawValue
-        setElement(newValue, at: x, y)
-      }
+      get { element(at: key.a, key.b) }
+      nonmutating set { setElement(newValue, at: key.a, key.b) }
     }
   }
 
   extension OptionalElementBuffer3D: @retroactive MemoCache {
-    public typealias Key = MemoizePack<Int, Int, Int>
+    public typealias Key = MemoizePack3<Int, Int, Int>
     public typealias Value = Element
     public subscript(key: Key) -> Element? {
-      get {
-        let (x, y, z) = key.rawValue
-        return element(at: x, y, z)
-      }
-      nonmutating set {
-        let (x, y, z) = key.rawValue
-        setElement(newValue, at: x, y, z)
-      }
+      get { element(at: key.a, key.b, key.c) }
+      nonmutating set { setElement(newValue, at: key.a, key.b, key.c) }
     }
   }
 
   extension OptionalElementBuffer4D: @retroactive MemoCache {
-    public typealias Key = MemoizePack<Int, Int, Int, Int>
+    public typealias Key = MemoizePack4<Int, Int, Int, Int>
     public typealias Value = Element
     public subscript(key: Key) -> Element? {
-      get {
-        let (x, y, z, w) = key.rawValue
-        return element(at: x, y, z, w)
-      }
-      nonmutating set {
-        let (x, y, z, w) = key.rawValue
-        setElement(newValue, at: x, y, z, w)
-      }
+      get { element(at: key.a, key.b, key.c, key.d) }
+      nonmutating set { setElement(newValue, at: key.a, key.b, key.c, key.d) }
     }
   }
 #endif

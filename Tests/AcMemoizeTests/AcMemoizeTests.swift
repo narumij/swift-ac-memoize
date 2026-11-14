@@ -44,20 +44,52 @@ struct Sushi {
 struct RedBlackTreeDictionaryTests {
 
   @Test func cacheType() {
-    let cache = Memo<Point, Int>.Cache<RedBlackTreeDictionary>()
-    #expect(type(of: cache) == RedBlackTreeDictionary<MemoizePack<Point>, Int>.self)
+    let cache = pathsCache<RedBlackTreeDictionary>()
+    #expect(type(of: cache) == RedBlackTreeDictionary<Point, Int>.self)
   }
 
   @Test func comparableOnlyArgument() {
-    var cache = Memo<Point, Int>.Cache<RedBlackTreeDictionary>()
+    var cache = pathsCache<RedBlackTreeDictionary>()
     #expect(paths(Point(x: 16, y: 16), cache: &cache) == 601_080_390)
     #expect(cache.count == 17 * 17 - 1)
   }
 
   @Test func multipleArguments() {
-    var cache = CountingCache(Memo<Int, Int, Int, Int>.Cache<RedBlackTreeDictionary>())
+    var cache = CountingCache(taraiCache<RedBlackTreeDictionary>())
     #expect(tarai(x: 24, y: 12, z: 0, cache: &cache) == 24)
     #expect(cache.hits > 0)
+  }
+}
+
+struct HashLRUCacheTests {
+
+  @Test func boundedCache() {
+    var cache = fibCache<HashLRUCache>(maxCount: 64)
+    #expect(fib(90, cache: &cache) == 2_880_067_194_370_816_120)
+    #expect(cache.count == 64)
+  }
+
+  @Test func unbounded() {
+    var cache = fibCache<HashLRUCache>()
+    #expect(fib(90, cache: &cache) == 2_880_067_194_370_816_120)
+    #expect(cache.count == 91)
+  }
+
+  // いちばん古いものから追い出し、読んだものは新しくなる
+  @Test func evictsLeastRecentlyUsed() {
+    var cache = HashLRUCache<Int, String>(maxCount: 2)
+    cache[1] = "a"
+    cache[2] = "b"
+    #expect(cache[1] == "a")
+    cache[3] = "c"
+    #expect(cache[2] == nil)
+    #expect(cache[1] == "a")
+    #expect(cache[3] == "c")
+    cache[3] = "C"
+    cache[4] = "d"
+    #expect(cache[1] == nil)
+    #expect(cache[3] == "C")
+    #expect(cache.count == 2)
   }
 }
 
@@ -65,13 +97,13 @@ struct RedBlackTreeDictionaryTests {
   struct LRUCacheTests {
 
     @Test func boundedCache() {
-      var cache = Memo<Point, Int>.Cache<LRUCache>(maxCount: 64)
+      var cache = pathsCache<LRUCache>(maxCount: 64)
       #expect(paths(Point(x: 16, y: 16), cache: &cache) == 601_080_390)
       #expect(cache.count == 64)
     }
 
     @Test func counting() {
-      var cache = NoncopyableCountingCache(Memo<Point, Int>.Cache<LRUCache>(maxCount: 64))
+      var cache = NoncopyableCountingCache(pathsCache<LRUCache>(maxCount: 64))
       _ = paths(Point(x: 16, y: 16), cache: &cache)
       #expect(cache.hits > 0)
       #expect(cache.misses > 0)
@@ -83,13 +115,13 @@ struct RedBlackTreeDictionaryTests {
   struct OptionalElementBufferTests {
 
     @Test func oneDimension() {
-      var cache = Memo<Int, Int>.Cache<OptionalElementBuffer>(capacity: 91)
+      var cache = fibCache<OptionalElementBuffer>(capacity: 91)
       #expect(fib(90, cache: &cache) == 2_880_067_194_370_816_120)
     }
 
     @Test func threeDimensions() {
       let s = Sushi(n: 10)
-      var cache = Memo<Int, Int, Int, Double>.Cache<OptionalElementBuffer3D>(width: 11, height: 11, depth: 11)
+      var cache = Sushi.recCache<OptionalElementBuffer3D>(width: 11, height: 11, depth: 11)
       #expect(abs(s.rec(2, 3, 5, cache: &cache) - 54.48064457488221) < 1e-9)
     }
   }

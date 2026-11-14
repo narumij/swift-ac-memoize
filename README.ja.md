@@ -47,7 +47,7 @@ dependencies: [
 
 ## 使い方
 
-`@Memoize`、`@Memoizable`、`Memo<...>.Cache<...>`の使い方は[Memoization][memoization]と同じです。
+`@Memoize`、`@Memoizable`、生成される別名`fooCache<...>`の使い方は[Memoization][memoization]と同じです。
 
 ```swift
 @Memoize
@@ -79,7 +79,7 @@ func paths(_ p: Point) -> Int {
   p.x == 0 || p.y == 0 ? 1 : paths(Point(x: p.x - 1, y: p.y)) + paths(Point(x: p.x, y: p.y - 1))
 }
 
-var cache = Memo<Point, Int>.Cache<RedBlackTreeDictionary>()
+var cache = pathsCache<RedBlackTreeDictionary>()
 paths(Point(x: 16, y: 16), cache: &cache)
 ```
 
@@ -89,7 +89,7 @@ paths(Point(x: 16, y: 16), cache: &cache)
 引数の型は`Comparable`であれば使えます。コピーできない型です。
 
 ```swift
-var cache = Memo<Point, Int>.Cache<LRUCache>(maxCount: 64)
+var cache = pathsCache<LRUCache>(maxCount: 64)
 paths(Point(x: 16, y: 16), cache: &cache)
 ```
 
@@ -106,12 +106,13 @@ func fib(_ n: Int) -> Int {
   n < 2 ? n : fib(n - 1) + fib(n - 2)
 }
 
-var cache = Memo<Int, Int>.Cache<OptionalElementBuffer>(capacity: 91)
+var cache = fibCache<OptionalElementBuffer>(capacity: 91)
 fib(90, cache: &cache)
 ```
 
 ```swift
-var cache = Memo<Int, Int, Int, Double>.Cache<OptionalElementBuffer3D>(width: 11, height: 11, depth: 11)
+// @Memoizable func rec(_ i: Int, _ j: Int, _ k: Int) -> Double の場合
+var cache = recCache<OptionalElementBuffer3D>(width: 11, height: 11, depth: 11)
 ```
 
 ## トレイト
